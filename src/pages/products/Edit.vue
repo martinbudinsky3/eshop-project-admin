@@ -1,8 +1,8 @@
 <template>
 <div class="q-my-xl">
     <q-card>
-        <q-card-title>Edit {{ productName }}</q-card-title>
-        <q-card-main>
+        <q-card-section>Edit {{ productName }}</q-card-section>
+        <q-card-section>
             <q-field :count="250">
                 <q-input float-label="Name" v-model="productName" max-length="250" />
             </q-field>
@@ -15,7 +15,7 @@
                     rows="7"
                 />
             </q-field>
-        </q-card-main>
+        </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
                 <q-btn label="Cancel" flat to="/products/index"/>
@@ -39,7 +39,7 @@ export default {
   methods: {
     updateProduct () {
       axios
-        .put(`http://wtech-eshop.test/products/` + this.$route.params.id, this.productData)
+        .put('http://wtech-eshop.test/products/' + this.$route.params.id, this.productData)
         .then(response => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been updated.' })
         })
@@ -51,7 +51,7 @@ export default {
   },
   mounted () {
     axios
-      .get(`http://wtech-eshop.test/products/` + this.$route.params.id + '/edit')
+      .get('http://wtech-eshop.test/products/' + this.$route.params.id + '/edit')
       .then(response => {
         this.productName = response.data.name
         this.productDescription = response.data.description

@@ -1,16 +1,16 @@
 <template>
 <q-layout>
 
-  <q-layout-header>
+  <q-header>
     <q-toolbar>
         <q-btn flat round dense icon="menu" @click="left = !left" class="q-mr-md"/>
-        <q-toolbar-title>MyESHOP - ADMIN<span slot="subtitle">Some subtitle</span></q-toolbar-title>
+        <q-toolbar-title>Eshop - admin<span slot="subtitle">Some subtitle</span></q-toolbar-title>
     </q-toolbar>
-  </q-layout-header>
+  </q-header>
 
-  <q-layout-drawer v-model="left" side="left">
+  <q-drawer v-model="left" side="left">
     <main-layout-drawer></main-layout-drawer>
-  </q-layout-drawer>
+  </q-drawer>
 
   <q-page-container>
     <div class="row full-width justify-center">
@@ -19,9 +19,9 @@
     </div>
   </q-page-container>
 
-  <q-layout-footer>
-    <div class="text-center q-pa-md">Copyright (C) 2018, Homer Simpson</div>
-  </q-layout-footer>
+  <q-footer>
+    <div class="text-center q-pa-md">Copyright (C) 2018</div>
+  </q-footer>
 </q-layout>
 </template>
 
