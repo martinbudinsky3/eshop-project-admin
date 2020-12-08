@@ -1,16 +1,18 @@
 <template>
 <div class="q-my-xl">
     <q-card>
-        <q-card-section>Create new product</q-card-section>
+        <q-card-section class="text-h6">Vytvorenie nového produktu</q-card-section>
         <q-card-section>
-            <q-input label="Názov" v-model="productName" />
+            <q-input class="q-mb-sm" label="Názov" v-model="productName" />
             <q-input
+              class="q-mb-sm"
               type="number"
               label="Cena"
               v-model="productPrice"
               step="any"
               min=0 />
             <q-select
+              class="q-mb-sm"
               option-value="id"
               option-label="name"
               v-model="selectedMainCategory"
@@ -18,6 +20,7 @@
               label="Hlavná kategória"
               @input="setSubcategory()"/>
             <q-select
+              class="q-mb-sm"
               map-options
               emit-value
               option-value="id"
@@ -26,6 +29,7 @@
               :options="selectedMainCategory.child_categories"
               label="Podkategória" />
             <q-select
+              class="q-mb-sm"
               map-options
               emit-value
               option-value="id"
@@ -33,32 +37,35 @@
               v-model="productBrand"
               :options="brands"
               label="Značka" />
-            <q-input label="Materiál" v-model="productMaterial" />
+            <q-input class="q-mb-sm" label="Materiál" v-model="productMaterial" />
             <q-input
+              class="q-mb-sm"
               type="textarea"
               label="Popis"
               v-model="productDescription"
               :max-height="100"
               rows="7"
             />
-            <q-btn class="q-mt-lg q-mb-sm" label="Pridať farbu a veľkosti" color="primary" @click="modal = true" />
+            <q-btn class="q-mt-lg q-mb-sm" label="Pridať farbu a veľkost" color="primary" @click="modal = true" />
             <q-dialog v-model="modal" persistent>
-              <q-card style="min-width: 350px">
+              <q-card style="min-width: 320px">
                 <q-card-section>
-                  <div class="text-h6">Farba a veľkosti</div>
+                  <div class="text-h6">Farba a veľkosť</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
                   <q-select
+                    class="q-mb-sm"
                     option-value="id"
                     option-label="name"
                     v-model="productDesignColor"
                     :options="colors"
                     label="Farba"/>
                   <q-select
+                    class="q-mb-sm"
                     v-model="productDesignSize"
                     :options="sizes"
-                    label="Veľkosti" />
+                    label="Veľkost" />
                   <q-input
                     type="number"
                     label="Množstvo"
@@ -80,14 +87,17 @@
                 </q-chip>
               </li>
             </ul>
-
+            <!--hide-upload-btn-->
             <q-uploader
               class="q-mt-lg"
-              url="http://localhost:8000/upload"
+              url="http://wtech-eshop.test/image"
               max-total-size="307200"
               label="Images"
               multiple
-              accept=".jpg"/>
+              accept=".jpg"
+              hide-upload-btn
+              ref="uploader"
+              />
         </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
@@ -111,7 +121,7 @@ export default {
   data () {
     return {
       productName: '',
-      selectedMainCategory: null,
+      selectedMainCategory: { child_categories: null },
       selectedSubcategory: null,
       productDescription: '',
       productPrice: '',
@@ -125,7 +135,8 @@ export default {
       brands: [],
       colors: [],
       sizes: [],
-      modal: false
+      modal: false,
+      productId: ''
     }
   },
   methods: {
@@ -133,13 +144,20 @@ export default {
       axios
         .post('http://wtech-eshop.test/products', this.productData)
         .then(response => {
+          this.productId = response.data.id
+        })
+        .then(response => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
-          this.$router.push({ path: '/products/' + response.data.id + '/edit' })
+          this.$router.push({ path: '/products/' + this.productId + '/edit' })
         })
         .catch(error => {
-          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba.' })
+          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
           console.log(error)
         })
+
+      if (this.productId) {
+        this.$refs.uploader.upload()
+      }
     },
 
     setSubcategory () {
@@ -207,7 +225,15 @@ export default {
   },
   computed: {
     productData: function () {
-      return { name: this.productName, description: this.productDescription }
+      return {
+        name: this.productName,
+        description: this.productDescription,
+        price: this.productPrice,
+        category_id: this.selectedSubcategory.id,
+        brand_id: this.productBrand.id,
+        material: this.productMaterial,
+        product_designs: this.productDesigns
+      }
     }
   }
 }
