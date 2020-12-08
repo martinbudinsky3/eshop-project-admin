@@ -41,7 +41,7 @@
               :max-height="100"
               rows="7"
             />
-            <q-btn class="q-mt-md q-mb-md" label="Pridať farbu a veľkosti" color="primary" @click="modal = true" />
+            <q-btn class="q-mt-lg q-mb-sm" label="Pridať farbu a veľkosti" color="primary" @click="modal = true" />
             <q-dialog v-model="modal" persistent>
               <q-card style="min-width: 350px">
                 <q-card-section>
@@ -50,15 +50,13 @@
 
                 <q-card-section class="q-pt-none">
                   <q-select
-                    map-options
-                    emit-value
                     option-value="id"
                     option-label="name"
                     v-model="productDesignColor"
                     :options="colors"
                     label="Farba"/>
                   <q-select
-                    v-model="productDesignSizes"
+                    v-model="productDesignSize"
                     :options="sizes"
                     label="Veľkosti" />
                   <q-input
@@ -70,11 +68,21 @@
 
                 <q-card-actions align="right" class="text-primary">
                   <q-btn flat label="Späť" v-close-popup />
-                  <q-btn color="primary" label="Pridať" v-close-popup />
+                  <q-btn color="primary" label="Pridať" v-close-popup @click="addDesign()"/>
                 </q-card-actions>
               </q-card>
             </q-dialog>
+
+            <ul class="ls-none">
+              <li v-for="(design, index) in productDesigns" :key="index">
+                <q-chip removable  color="white" @remove="removeDesign(design)">
+                  {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
+                </q-chip>
+              </li>
+            </ul>
+
             <q-uploader
+              class="q-mt-lg"
               url="http://localhost:8000/upload"
               max-total-size="307200"
               label="Images"
@@ -83,8 +91,8 @@
         </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
-                <q-btn label="Cancel" flat to="/products/index"/>
-                <q-btn label="Create" color="primary" @click="createProduct"/>
+                <q-btn label="Zrušiť" flat to="/products/index"/>
+                <q-btn label="Pridať" color="primary" @click="createProduct"/>
             </div>
         </q-card-actions>
     </q-card>
@@ -103,14 +111,14 @@ export default {
   data () {
     return {
       productName: '',
-      selectedMainCategory: {},
+      selectedMainCategory: null,
       selectedSubcategory: null,
       productDescription: '',
       productPrice: '',
       productMaterial: '',
       productBrand: null,
       productDesignColor: null,
-      productDesignSizes: [],
+      productDesignSize: '',
       productDesignQuantity: '',
       mainCategories: [],
       productDesigns: [],
@@ -136,6 +144,22 @@ export default {
 
     setSubcategory () {
       this.selectedSubcategory = this.selectedMainCategory.child_categories[0]
+    },
+
+    addDesign () {
+      this.productDesigns.push({
+        color: this.productDesignColor,
+        size: this.productDesignSize,
+        quantity: this.productDesignQuantity
+      })
+
+      this.productDesignColor = null
+      this.productDesignSizes = []
+      this.productDesignQuantity = ''
+    },
+
+    removeDesign (design) {
+      this.productDesigns = this.productDesigns.filter(item => item !== design)
     }
   },
   mounted () {
