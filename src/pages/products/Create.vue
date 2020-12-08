@@ -11,6 +11,21 @@
               step="any"
               min=0 />
             <q-select
+              option-value="id"
+              option-label="name"
+              v-model="selectedMainCategory"
+              :options="mainCategories"
+              label="Hlavná kategória"
+              @input="setSubcategory()"/>
+            <q-select
+              map-options
+              emit-value
+              option-value="id"
+              option-label="name"
+              v-model="selectedSubcategory"
+              :options="selectedMainCategory.child_categories"
+              label="Podkategória" />
+            <q-select
               map-options
               emit-value
               option-value="id"
@@ -41,7 +56,7 @@
                     option-label="name"
                     v-model="productDesignColor"
                     :options="colors"
-                    label="Farba" />
+                    label="Farba"/>
                   <q-select
                     v-model="productDesignSizes"
                     :options="sizes"
@@ -88,13 +103,16 @@ export default {
   data () {
     return {
       productName: '',
+      selectedMainCategory: {},
+      selectedSubcategory: null,
       productDescription: '',
       productPrice: '',
       productMaterial: '',
       productBrand: null,
-      productDesignColor: '',
+      productDesignColor: null,
       productDesignSizes: [],
       productDesignQuantity: '',
+      mainCategories: [],
       productDesigns: [],
       brands: [],
       colors: [],
@@ -114,9 +132,25 @@ export default {
           this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba.' })
           console.log(error)
         })
+    },
+
+    setSubcategory () {
+      this.selectedSubcategory = this.selectedMainCategory.child_categories[0]
     }
   },
   mounted () {
+    axios
+      .get('http://wtech-eshop.test/category')
+      .then(response => {
+        this.mainCategories = response.data
+        this.selectedMainCategory = this.mainCategories[0]
+        this.selectedSubcategory = this.selectedMainCategory.child_categories[0]
+      })
+      .catch(error => {
+        this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní kategórií.' })
+        console.log(error)
+      })
+
     axios
       .get('http://wtech-eshop.test/brand')
       .then(response => {
