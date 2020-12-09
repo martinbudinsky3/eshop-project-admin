@@ -46,11 +46,11 @@
               :max-height="100"
               rows="7"
             />
-            <q-btn class="q-mt-lg q-mb-sm" label="Pridať farbu a veľkost" color="primary" @click="modal = true" />
+            <q-btn class="q-mt-lg q-mb-sm" label="Pridať prevedenie" color="primary" @click="createDesign()" />
             <q-dialog v-model="modal" persistent>
               <q-card style="min-width: 320px">
                 <q-card-section>
-                  <div class="text-h6">Farba a veľkosť</div>
+                  <div class="text-h6">Prevedenie produktu</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
@@ -75,27 +75,28 @@
 
                 <q-card-actions align="right" class="text-primary">
                   <q-btn flat label="Späť" v-close-popup />
-                  <q-btn color="primary" label="Pridať" v-close-popup @click="addDesign()"/>
+                  <q-btn color="primary" label="Pridať" v-close-popup @click="saveDesign()"/>
                 </q-card-actions>
               </q-card>
             </q-dialog>
 
             <ul class="ls-none">
-              <li v-for="(design, index) in productDesigns" :key="index">
+              <li class="cursor-pointer" v-for="(design, index) in productDesigns" :key="index" @click="editDesign(index)">
                 <q-chip removable  color="white" @remove="removeDesign(design)">
                   {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
                 </q-chip>
               </li>
             </ul>
-            <!--hide-upload-btn-->
             <q-uploader
               class="q-mt-lg"
               url="http://wtech-eshop.test/image"
               max-total-size="307200"
               label="Images"
-              multiple
               accept=".jpg"
               hide-upload-btn
+              multiple
+              batch
+              :form-fields="productIdField"
               ref="uploader"
               />
         </q-card-section>
@@ -126,17 +127,19 @@ export default {
       productDescription: '',
       productPrice: '',
       productMaterial: '',
-      productBrand: null,
+      productBrand: '',
       productDesignColor: null,
       productDesignSize: '',
       productDesignQuantity: '',
+      updatedProductDesignIndex: '',
       mainCategories: [],
       productDesigns: [],
       brands: [],
       colors: [],
       sizes: [],
       modal: false,
-      productId: ''
+      productId: '',
+      images: []
     }
   },
   methods: {
@@ -145,6 +148,7 @@ export default {
         .post('http://wtech-eshop.test/products', this.productData)
         .then(response => {
           this.productId = response.data.id
+          // return this.$refs.uploader.upload()
         })
         .then(response => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
@@ -155,29 +159,45 @@ export default {
           console.log(error)
         })
 
-      if (this.productId) {
-        this.$refs.uploader.upload()
-      }
+      // this.$refs.uploader.upload()
     },
 
     setSubcategory () {
-      this.selectedSubcategory = this.selectedMainCategory.child_categories[0]
+      this.selectedSubcategory = this.selectedMainCategory.child_categories[0].id
     },
 
-    addDesign () {
-      this.productDesigns.push({
-        color: this.productDesignColor,
-        size: this.productDesignSize,
-        quantity: this.productDesignQuantity
-      })
-
+    createDesign () {
+      this.modal = true
+      this.updatedProductDesignIndex = ''
       this.productDesignColor = null
-      this.productDesignSizes = []
+      this.productDesignSize = ''
       this.productDesignQuantity = ''
+    },
+
+    saveDesign () {
+      if (this.updatedProductDesignIndex === '') {
+        this.productDesigns.push({
+          color: this.productDesignColor,
+          size: this.productDesignSize,
+          quantity: this.productDesignQuantity
+        })
+      } else {
+        this.productDesigns[this.updatedProductDesignIndex].color = this.productDesignColor
+        this.productDesigns[this.updatedProductDesignIndex].size = this.productDesignSize
+        this.productDesigns[this.updatedProductDesignIndex].quantity = this.productDesignQuantity
+      }
     },
 
     removeDesign (design) {
       this.productDesigns = this.productDesigns.filter(item => item !== design)
+    },
+
+    editDesign (index) {
+      this.modal = true
+      this.updatedProductDesignIndex = index
+      this.productDesignColor = this.productDesigns[index].color
+      this.productDesignSize = this.productDesigns[index].size
+      this.productDesignQuantity = this.productDesigns[index].quantity
     }
   },
   mounted () {
@@ -186,7 +206,7 @@ export default {
       .then(response => {
         this.mainCategories = response.data
         this.selectedMainCategory = this.mainCategories[0]
-        this.selectedSubcategory = this.selectedMainCategory.child_categories[0]
+        this.selectedSubcategory = this.selectedMainCategory.child_categories[0].id
       })
       .catch(error => {
         this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní kategórií.' })
@@ -229,11 +249,18 @@ export default {
         name: this.productName,
         description: this.productDescription,
         price: this.productPrice,
-        category_id: this.selectedSubcategory.id,
-        brand_id: this.productBrand.id,
+        category_id: this.selectedSubcategory,
+        brand_id: this.productBrand,
         material: this.productMaterial,
         product_designs: this.productDesigns
       }
+    },
+
+    productIdField: function () {
+      return [{
+        name: 'product_id',
+        value: this.productId
+      }]
     }
   }
 }
