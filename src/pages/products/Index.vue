@@ -49,6 +49,9 @@ export default {
         sortBy: 'name',
         descending: true
       },
+      filter: {
+
+      },
       serverData: []
     }
   },
@@ -90,28 +93,34 @@ export default {
         color: 'primary',
         ok: true,
         cancel: true
-      }).then(() => {
+      }).onOk(() => {
         axios
           .delete(`http://wtech-eshop.test/products/${id}`)
           .then(() => {
-            this.serverData[rowIndex].id = 'DELETED'
+            // this.serverData[rowIndex].id = 'DELETED'
+            this.request(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been deleted.' })
           })
           .catch(error => {
             this.$q.notify({ type: 'negative', timeout: 2000, message: 'An error has been occured.' })
             console.log(error)
           })
-      }).catch(() => {
+      }).onCancel(() => {
         // cancel - do nothing?
       })
     }
   },
   mounted () {
     // once mounted, we need to trigger the initial server data fetch
-    this.request({
-      pagination: this.serverPagination,
-      filter: this.filter
-    })
+    this.request(this.requestParams)
+  },
+  computed: {
+    requestParams: function () {
+      return {
+        pagination: this.serverPagination,
+        filter: this.filter
+      }
+    }
   }
 }
 </script>

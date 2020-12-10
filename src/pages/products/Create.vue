@@ -122,7 +122,7 @@ export default {
   data () {
     return {
       productName: '',
-      selectedMainCategory: { child_categories: null },
+      selectedMainCategory: { id: 1, name: '', child_categories: null },
       selectedSubcategory: null,
       productDescription: '',
       productPrice: '',
@@ -148,9 +148,10 @@ export default {
         .post('http://wtech-eshop.test/products', this.productData)
         .then(response => {
           this.productId = response.data.id
-          // return this.$refs.uploader.upload()
+          // this.$refs.uploader.upload()
         })
         .then(response => {
+          // this.$refs.uploader.upload()
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
           this.$router.push({ path: '/products/' + this.productId + '/edit' })
         })
@@ -159,7 +160,7 @@ export default {
           console.log(error)
         })
 
-      // this.$refs.uploader.upload()
+      // console.log(this.$refs.uploader.files)
     },
 
     setSubcategory () {
@@ -198,6 +199,11 @@ export default {
       this.productDesignColor = this.productDesigns[index].color
       this.productDesignSize = this.productDesigns[index].size
       this.productDesignQuantity = this.productDesigns[index].quantity
+    },
+
+    factoryFn (files) {
+      const data = new FormData()
+      data.append('files', files)
     }
   },
   mounted () {
