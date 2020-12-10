@@ -6,10 +6,18 @@
       :pagination.sync="serverPagination"
       :loading="loading"
       @request="request"
+      :filter="filter"
       :columns="columns"
       title="List of products"
       binary-state-sort
       >
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td key="id" :props="props">
           <span>{{ props.row.id }}</span>
@@ -49,9 +57,7 @@ export default {
         sortBy: 'name',
         descending: true
       },
-      filter: {
-
-      },
+      filter: '',
       serverData: []
     }
   },
@@ -61,7 +67,7 @@ export default {
       this.loading = true
       // fetch data
       axios
-        .get(`http://wtech-eshop.test/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}`)
+        .get(`http://wtech-eshop.test/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
         .then(({ data }) => {
           // updating pagination to reflect in the UI
           this.serverPagination = pagination
