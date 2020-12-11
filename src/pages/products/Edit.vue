@@ -105,7 +105,7 @@ export default {
   data () {
     return {
       productName: '',
-      selectedMainCategory: { child_categories: null },
+      selectedMainCategory: { id: 1, name: '', child_categories: null },
       selectedSubcategory: null,
       productDescription: '',
       productPrice: '',

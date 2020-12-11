@@ -25,9 +25,11 @@
         <q-td key="name" :props="props">
           <span>{{ props.row.name }}</span>
         </q-td>
+        <q-td key="price" :props="props">
+          <span>{{ props.row.price }}</span>
+        </q-td>
         <q-td class="text-right">
-          <div v-if="props.row.id == 'DELETED'">DELETED</div>
-          <div v-else>
+          <div>
             <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/products/' + props.row.id + '/edit')" />
             <q-btn round icon="delete" @click="destroy(props.row.id, props.row.name, props.row.__index)"/>
           </div>
@@ -45,8 +47,9 @@ export default {
     return {
       columns: [
         { name: 'id', label: 'ID', field: 'id', sortable: false, align: 'left' },
-        { name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left' },
-        { name: 'actions', label: 'Actions', sortable: false, align: 'right' }
+        { name: 'name', label: 'Názov', field: 'name', sortable: true, align: 'left' },
+        { name: 'price', label: 'Cena', field: 'price', sortable: false, align: 'left' },
+        { name: 'actions', label: 'Akcie', sortable: false, align: 'right' }
       ],
       selected: [],
       loading: false,
@@ -103,7 +106,6 @@ export default {
         axios
           .delete(`http://wtech-eshop.test/products/${id}`)
           .then(() => {
-            // this.serverData[rowIndex].id = 'DELETED'
             this.request(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been deleted.' })
           })
@@ -111,8 +113,6 @@ export default {
             this.$q.notify({ type: 'negative', timeout: 2000, message: 'An error has been occured.' })
             console.log(error)
           })
-      }).onCancel(() => {
-        // cancel - do nothing?
       })
     }
   },

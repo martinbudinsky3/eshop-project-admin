@@ -89,14 +89,13 @@
             </ul>
             <q-uploader
               class="q-mt-lg"
-              url="http://wtech-eshop.test/image"
+              url=""
               max-total-size="307200"
               label="Images"
               accept=".jpg"
               hide-upload-btn
               multiple
               batch
-              :form-fields="productIdField"
               ref="uploader"
               />
         </q-card-section>
@@ -138,20 +137,21 @@ export default {
       colors: [],
       sizes: [],
       modal: false,
-      productId: '',
-      images: []
+      productId: 2
     }
   },
+
   methods: {
     createProduct () {
       axios
         .post('http://wtech-eshop.test/products', this.productData)
         .then(response => {
           this.productId = response.data.id
-          // this.$refs.uploader.upload()
         })
-        .then(response => {
-          // this.$refs.uploader.upload()
+        .then(() => {
+          return this.uploadImages()
+        })
+        .then(() => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
           this.$router.push({ path: '/products/' + this.productId + '/edit' })
         })
@@ -159,8 +159,19 @@ export default {
           this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
           console.log(error)
         })
+    },
 
-      // console.log(this.$refs.uploader.files)
+    uploadImages () {
+      const config = { headers: { contentType: 'multipart/form-data' } }
+      const uploadData = new FormData()
+      const images = this.$refs.uploader.files
+
+      uploadData.append('productId', this.productId)
+      for (let i = 0; i < images.length; i++) {
+        uploadData.append(`image[${i}]`, images[i])
+      }
+
+      return axios.post('http://wtech-eshop.test/image', uploadData, config)
     },
 
     setSubcategory () {
@@ -199,11 +210,6 @@ export default {
       this.productDesignColor = this.productDesigns[index].color
       this.productDesignSize = this.productDesigns[index].size
       this.productDesignQuantity = this.productDesigns[index].quantity
-    },
-
-    factoryFn (files) {
-      const data = new FormData()
-      data.append('files', files)
     }
   },
   mounted () {
@@ -260,13 +266,6 @@ export default {
         material: this.productMaterial,
         product_designs: this.productDesigns
       }
-    },
-
-    productIdField: function () {
-      return [{
-        name: 'product_id',
-        value: this.productId
-      }]
     }
   }
 }
