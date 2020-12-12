@@ -195,7 +195,7 @@ export default {
       } else {
         this.imageError = false
         axios
-          .post('http://wtech-eshop.test/products', this.productData)
+          .post(process.env.API + '/products', this.productData)
           .then(response => {
             this.productId = response.data.id
           })
@@ -227,7 +227,7 @@ export default {
         uploadData.append(`image[${i}]`, images[i])
       }
 
-      return axios.post('http://wtech-eshop.test/image', uploadData, config)
+      return axios.post(process.env.API + '/image', uploadData, config)
     },
 
     showErrors (errors) {
@@ -308,7 +308,7 @@ export default {
   },
   mounted () {
     axios
-      .get('http://wtech-eshop.test/category')
+      .get(process.env.API + '/category')
       .then(response => {
         this.mainCategories = response.data
         this.selectedMainCategory = this.mainCategories[0]
@@ -320,7 +320,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/brand')
+      .get(process.env.API + '/brand')
       .then(response => {
         this.brands = response.data
       })
@@ -330,7 +330,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/color')
+      .get(process.env.API + '/color')
       .then(response => {
         this.colors = response.data
       })
@@ -340,7 +340,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/size')
+      .get(process.env.API + '/size')
       .then(response => {
         this.sizes = response.data
       })

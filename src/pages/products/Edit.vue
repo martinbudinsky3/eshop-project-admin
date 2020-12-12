@@ -214,7 +214,7 @@ export default {
         this.imageError = true
       } else {
         axios
-          .put('http://wtech-eshop.test/products/' + this.$route.params.id, this.productData)
+          .put(process.env.API + '/products/' + this.$route.params.id, this.productData)
           .then(response => {
             return this.uploadImages()
           })
@@ -232,6 +232,14 @@ export default {
     },
 
     uploadImages () {
+      if (this.$refs.uploader.files.length === 0) {
+        return new Promise((resolve, reject) => {
+          setTimeout(function () {
+            resolve('Success!')
+          }, 250)
+        })
+      }
+
       const config = { headers: { contentType: 'multipart/form-data' } }
       const uploadData = new FormData()
       const images = this.$refs.uploader.files
@@ -241,7 +249,7 @@ export default {
         uploadData.append(`image[${i}]`, images[i])
       }
 
-      return axios.post('http://wtech-eshop.test/image', uploadData, config)
+      return axios.post(process.env.API + '/image', uploadData, config)
     },
 
     showErrors (errors) {
@@ -329,7 +337,7 @@ export default {
   },
   mounted () {
     axios
-      .get('http://wtech-eshop.test/brand')
+      .get(process.env.API + '/brand')
       .then(response => {
         this.brands = response.data
       })
@@ -339,7 +347,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/color')
+      .get(process.env.API + '/color')
       .then(response => {
         this.colors = response.data
       })
@@ -349,7 +357,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/size')
+      .get(process.env.API + '/size')
       .then(response => {
         this.sizes = response.data
       })
@@ -359,7 +367,7 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/image/' + this.$route.params.id)
+      .get(process.env.API + '/image/' + this.$route.params.id)
       .then(response => {
         this.originalImages = response.data
         console.log(response.data)
@@ -370,13 +378,13 @@ export default {
       })
 
     axios
-      .get('http://wtech-eshop.test/category')
+      .get(process.env.API + '/category')
       .then(response => {
         this.mainCategories = response.data
       })
       .then(data => {
         axios
-          .get('http://wtech-eshop.test/products/' + this.$route.params.id + '/edit')
+          .get(process.env.API + '/products/' + this.$route.params.id + '/edit')
           .then(response => {
             this.productName = response.data.name
             this.productPrice = response.data.price

@@ -70,7 +70,7 @@ export default {
       this.loading = true
       // fetch data
       axios
-        .get(`http://wtech-eshop.test/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
+        .get(process.env.API + `/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
         .then(({ data }) => {
           // updating pagination to reflect in the UI
           this.serverPagination = pagination
@@ -104,7 +104,7 @@ export default {
         cancel: true
       }).onOk(() => {
         axios
-          .delete(`http://wtech-eshop.test/products/${id}`)
+          .delete(process.env.API + `/products/${id}`)
           .then(() => {
             this.request(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been deleted.' })
