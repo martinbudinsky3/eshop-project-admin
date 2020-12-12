@@ -219,13 +219,13 @@ export default {
             return this.uploadImages()
           })
           .then(() => {
-            this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been updated.' })
+            this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol upravený.' })
           })
           .catch(error => {
             if (error.response.data.errors) {
               this.showErrors(error.response.data.errors)
             }
-            this.$q.notify({ type: 'negative', timeout: 2000, message: 'An error has been occured.' })
+            this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nastala chyba.' })
             console.log(error)
           })
       }
