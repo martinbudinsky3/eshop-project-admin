@@ -3,14 +3,25 @@
     <q-card>
         <q-card-section class="text-h5">Vytvorenie nového produktu</q-card-section>
         <q-card-section>
-            <q-input class="q-mb-sm" label="Názov" v-model="productName" />
+            <q-input
+              class="q-mb-sm"
+              label="Názov"
+              maxlength="255"
+              counter
+              v-model="productName"
+              error-message="Pole cena je povinné."
+              :error="nameError"
+            />
             <q-input
               class="q-mb-sm"
               type="number"
               label="Cena"
               v-model="productPrice"
               step="any"
-              min=0 />
+              min=0
+              error-message="Pole cena je povinné."
+              :error="priceError"
+              />
             <q-select
               class="q-mb-sm"
               option-value="id"
@@ -18,7 +29,8 @@
               v-model="selectedMainCategory"
               :options="mainCategories"
               label="Hlavná kategória"
-              @input="setSubcategory()"/>
+              @input="setSubcategory()"
+              />
             <q-select
               class="q-mb-sm"
               map-options
@@ -27,7 +39,8 @@
               option-label="name"
               v-model="selectedSubcategory"
               :options="selectedMainCategory.child_categories"
-              label="Podkategória" />
+              label="Podkategória"
+              />
             <q-select
               class="q-mb-sm"
               map-options
@@ -36,8 +49,19 @@
               option-label="name"
               v-model="productBrand"
               :options="brands"
-              label="Značka" />
-            <q-input class="q-mb-sm" label="Materiál" v-model="productMaterial" />
+              label="Značka"
+              error-message="Pole značka je povinné."
+              :error="brandError"
+              />
+            <q-input
+              class="q-mb-sm"
+              label="Materiál"
+              maxlength="100"
+              counter
+              v-model="productMaterial"
+              error-message="Pole materiál je povinné."
+              :error="materialError"
+              />
             <q-input
               class="q-mb-sm"
               type="textarea"
@@ -45,13 +69,15 @@
               v-model="productDescription"
               :max-height="100"
               rows="7"
+              error-message="Pole popis je povinné."
+              :error="descriptionError"
             />
           </q-card-section>
           <q-card-section class=text-h6>Varianty produktu</q-card-section>
           <q-card-section>
             <q-btn class="q-mb-sm" label="Pridať variant" color="primary" @click="createDesign()" />
             <q-dialog v-model="modal" persistent>
-              <q-card style="min-width: 320px">
+              <q-card class="design-modal">
                 <q-card-section>
                   <div class="text-h6">Variant produktu</div>
                 </q-card-section>
@@ -90,6 +116,8 @@
                 </q-chip>
               </li>
             </ul>
+            <p class="text-red-9 text-weight-bold" :class="{'hidden': !designError}">Aspoň jeden variant je povinný.</p>
+            <p class="text-red-9 text-weight-bold" :class="{'hidden': !designError}">V každom variante sú povinné všetky polia.</p>
           </q-card-section>
           <q-card-section class="text-h6">Obrázky</q-card-section>
           <q-card-section>
@@ -103,7 +131,8 @@
               batch
               ref="uploader"
               />
-        </q-card-section>
+            <p class="text-red-9 text-weight-bold" :class="{'hidden': !imageError}">Aspoň jeden obrázok je povinný.</p>
+          </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
                 <q-btn label="Zrušiť" flat to="/products/index"/>
@@ -142,29 +171,50 @@ export default {
       colors: [],
       sizes: [],
       modal: false,
-      productId: 2
+      productId: 2,
+
+      // error flags
+      nameError: false,
+      priceError: false,
+      brandError: false,
+      materialError: false,
+      descriptionError: false,
+      designError: false,
+      imageError: false
     }
   },
 
   methods: {
     createProduct () {
-      axios
-        .post('http://wtech-eshop.test/products', this.productData)
-        .then(response => {
-          this.productId = response.data.id
-        })
-        .then(() => {
-          return this.uploadImages()
-        })
-        .then(() => {
-          this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
-          this.$router.push({ path: '/products/' + this.productId + '/edit' })
-        })
-        .catch(error => {
-          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
-          console.log(error)
-        })
+      // hide error labels
+      this.hideErrors()
+
+      // if there are no uploaded images don't send request
+      if (this.$refs.uploader.files.length === 0) {
+        this.imageError = true
+      } else {
+        this.imageError = false
+        axios
+          .post('http://wtech-eshop.test/products', this.productData)
+          .then(response => {
+            this.productId = response.data.id
+          })
+          .then(() => {
+            return this.uploadImages()
+          })
+          .then(() => {
+            this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
+            this.$router.push({ path: '/products/' + this.productId + '/edit' })
+          })
+          .catch(error => {
+            if (error.response.data.errors) {
+              this.showErrors(error.response.data.errors)
+            }
+            console.log(error)
+            this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
+          })
       // this.uploadImages()
+      }
     },
 
     uploadImages () {
@@ -178,6 +228,44 @@ export default {
       }
 
       return axios.post('http://wtech-eshop.test/image', uploadData, config)
+    },
+
+    showErrors (errors) {
+      this.hideErrors()
+
+      if (errors.brand_id) {
+        this.brandError = true
+      }
+
+      if (errors.description) {
+        this.descriptionError = true
+      }
+
+      if (errors.material) {
+        this.materialError = true
+      }
+
+      if (errors.name) {
+        this.nameError = true
+      }
+
+      if (errors.price) {
+        this.priceError = true
+      }
+
+      if (errors.product_designs) {
+        this.designError = true
+      }
+    },
+
+    hideErrors () {
+      this.nameError = false
+      this.priceError = false
+      this.brandError = false
+      this.materialError = false
+      this.descriptionError = false
+      this.designError = false
+      this.imageError = false
     },
 
     setSubcategory () {
