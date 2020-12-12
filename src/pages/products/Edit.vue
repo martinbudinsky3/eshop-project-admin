@@ -1,7 +1,7 @@
 <template>
 <div class="q-my-xl">
     <q-card>
-        <q-card-section class="text-h6">Editovanie {{ productName }}</q-card-section>
+        <q-card-section class="text-h5">Editovanie {{ productName }}</q-card-section>
          <q-card-section>
             <q-input class="q-mb-sm" label="Názov" v-model="productName" />
             <q-input
@@ -46,7 +46,10 @@
               :max-height="100"
               rows="7"
             />
-            <q-btn class="q-mt-lg q-mb-sm" label="Pridať prevedenie" color="primary" @click="createDesign()" />
+          </q-card-section>
+          <q-card-section class=text-h6>Varianty produktu</q-card-section>
+          <q-card-section>
+            <q-btn class="q-mb-sm" label="Pridať variant" color="primary" @click="createDesign()" />
             <q-dialog v-model="modal" persistent>
               <q-card style="min-width: 320px">
                 <q-card-section>
@@ -87,6 +90,31 @@
                 </q-chip>
               </li>
             </ul>
+          </q-card-section>
+          <q-card-section class="text-h6">Obrázky</q-card-section>
+          <q-card-section>
+            <ul class="ls-none">
+              <li class="cursor-pointer q-px-sm" style="display: inline;" v-for="(image, index) in originalImages" :key="index">
+                <q-img
+                  :src="'http://wtech-eshop.test/' + image.path"
+                  spinner-color="grey"
+                  style="height: 280px; max-width: 200px"
+                >
+                  <q-btn icon="close" class="absolute all-pointer-events" unelevated color="grey-6" style="top: 8px; right: 8px" round @click="removeImage(image)"/>
+                </q-img>
+              </li>
+            </ul>
+            <q-uploader
+              class="q-mt-sm"
+              url=""
+              max-file-size="307200"
+              label="Podporovaný formát: JPG, max. veľkosť: 300KiB"
+              accept=".jpg"
+              hide-upload-btn
+              multiple
+              batch
+              ref="uploader"
+              />
         </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
@@ -97,6 +125,10 @@
     </q-card>
 </div>
 </template>
+
+<style lang="stylus">
+
+</style>
 
 <script>
 import axios from 'axios'
@@ -122,7 +154,9 @@ export default {
       colors: [],
       sizes: [],
       modal: false,
-      productId: ''
+      productId: '',
+      originalImages: [],
+      deletedImages: []
     }
   },
   methods: {
@@ -130,6 +164,9 @@ export default {
       axios
         .put('http://wtech-eshop.test/products/' + this.$route.params.id, this.productData)
         .then(response => {
+          return this.uploadImages()
+        })
+        .then(() => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been updated.' })
         })
         .catch(error => {
@@ -137,6 +174,20 @@ export default {
           console.log(error)
         })
     },
+
+    uploadImages () {
+      const config = { headers: { contentType: 'multipart/form-data' } }
+      const uploadData = new FormData()
+      const images = this.$refs.uploader.files
+
+      uploadData.append('productId', this.$route.params.id)
+      for (let i = 0; i < images.length; i++) {
+        uploadData.append(`image[${i}]`, images[i])
+      }
+
+      return axios.post('http://wtech-eshop.test/image', uploadData, config)
+    },
+
     setSubcategory () {
       this.selectedSubcategory = this.selectedMainCategory.child_categories[0].id
     },
@@ -176,6 +227,11 @@ export default {
       this.productDesignColor = this.productDesigns[index].color
       this.productDesignSize = this.productDesigns[index].size
       this.productDesignQuantity = this.productDesigns[index].quantity
+    },
+
+    removeImage (image) {
+      this.originalImages = this.originalImages.filter(item => item !== image)
+      this.deletedImages.push(image)
     }
   },
   mounted () {
@@ -206,6 +262,17 @@ export default {
       })
       .catch(error => {
         this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní veľkostí.' })
+        console.log(error)
+      })
+
+    axios
+      .get('http://wtech-eshop.test/image/' + this.$route.params.id)
+      .then(response => {
+        this.originalImages = response.data
+        console.log(response.data)
+      })
+      .catch(error => {
+        this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní obrázkov.' })
         console.log(error)
       })
 
@@ -247,7 +314,8 @@ export default {
         brand_id: this.productBrand,
         material: this.productMaterial,
         product_designs: this.productDesigns,
-        deleted_designs: this.deletedDesigns
+        deleted_designs: this.deletedDesigns,
+        deleted_images: this.deletedImages
       }
     }
   }

@@ -1,7 +1,7 @@
 <template>
 <div class="q-my-xl">
     <q-card>
-        <q-card-section class="text-h6">Vytvorenie nového produktu</q-card-section>
+        <q-card-section class="text-h5">Vytvorenie nového produktu</q-card-section>
         <q-card-section>
             <q-input class="q-mb-sm" label="Názov" v-model="productName" />
             <q-input
@@ -46,11 +46,14 @@
               :max-height="100"
               rows="7"
             />
-            <q-btn class="q-mt-lg q-mb-sm" label="Pridať prevedenie" color="primary" @click="createDesign()" />
+          </q-card-section>
+          <q-card-section class=text-h6>Varianty produktu</q-card-section>
+          <q-card-section>
+            <q-btn class="q-mb-sm" label="Pridať variant" color="primary" @click="createDesign()" />
             <q-dialog v-model="modal" persistent>
               <q-card style="min-width: 320px">
                 <q-card-section>
-                  <div class="text-h6">Prevedenie produktu</div>
+                  <div class="text-h6">Variant produktu</div>
                 </q-card-section>
 
                 <q-card-section class="q-pt-none">
@@ -87,11 +90,13 @@
                 </q-chip>
               </li>
             </ul>
+          </q-card-section>
+          <q-card-section class="text-h6">Obrázky</q-card-section>
+          <q-card-section>
             <q-uploader
-              class="q-mt-lg"
               url=""
-              max-total-size="307200"
-              label="Images"
+              max-file-size="307200"
+              label="Podporovaný formát: JPG, max. veľkosť: 300KiB"
               accept=".jpg"
               hide-upload-btn
               multiple
@@ -159,6 +164,7 @@ export default {
           this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
           console.log(error)
         })
+      // this.uploadImages()
     },
 
     uploadImages () {
