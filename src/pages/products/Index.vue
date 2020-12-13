@@ -78,8 +78,6 @@ export default {
           // we also set (or update) rowsNumber
           this.serverPagination.rowsNumber = data.rowsNumber
 
-          console.log(data.rowsNumber)
-
           // then we update the rows with the fetched ones
           this.serverData = data.rows
 

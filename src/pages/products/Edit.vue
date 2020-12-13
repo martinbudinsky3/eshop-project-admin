@@ -370,7 +370,6 @@ export default {
       .get(process.env.API + '/image/' + this.$route.params.id)
       .then(response => {
         this.originalImages = response.data
-        console.log(response.data)
       })
       .catch(error => {
         this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní obrázkov.' })
