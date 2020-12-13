@@ -97,8 +97,8 @@ export default {
 
     destroy (id, name, rowIndex) {
       this.$q.dialog({
-        title: 'Delete',
-        message: 'Are you sure to delete ' + name + '?',
+        title: 'Odstránenie',
+        message: 'Naozaj chcete odstrániť ' + name + '?',
         color: 'primary',
         ok: true,
         cancel: true
@@ -107,10 +107,10 @@ export default {
           .delete(process.env.API + `/products/${id}`)
           .then(() => {
             this.request(this.requestParams)
-            this.$q.notify({ type: 'positive', timeout: 2000, message: 'The product has been deleted.' })
+            this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol odstránený.' })
           })
           .catch(error => {
-            this.$q.notify({ type: 'negative', timeout: 2000, message: 'An error has been occured.' })
+            this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nastala chyba.' })
             console.log(error)
           })
       })
