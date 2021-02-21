@@ -194,13 +194,13 @@ export default {
         this.imageError = true
       } else {
         this.imageError = false
+        const config = { headers: { contentType: 'multipart/form-data' } }
+        const uploadData = this.createFormData()
+
         axios
-          .post(process.env.API + '/products', this.productData)
+          .post(process.env.API + '/products', uploadData, config)
           .then(response => {
             this.productId = response.data.id
-          })
-          .then(() => {
-            return this.uploadImages()
           })
           .then(() => {
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
@@ -208,26 +208,40 @@ export default {
           })
           .catch(error => {
             if (error.response.data.errors) {
+              console.log(error.response.data.errors)
               this.showErrors(error.response.data.errors)
             }
+
             console.log(error)
             this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
           })
-      // this.uploadImages()
       }
     },
 
-    uploadImages () {
-      const config = { headers: { contentType: 'multipart/form-data' } }
+    createFormData () {
       const uploadData = new FormData()
       const images = this.$refs.uploader.files
 
-      uploadData.append('productId', this.productId)
-      for (let i = 0; i < images.length; i++) {
-        uploadData.append(`image[${i}]`, images[i])
+      uploadData.append('name', this.productName)
+      uploadData.append('description', this.productDescription)
+      uploadData.append('price', this.productPrice)
+      uploadData.append('category_id', this.selectedSubcategory)
+      uploadData.append('brand_id', this.productBrand)
+      uploadData.append('material', this.productMaterial)
+
+      // append product designs
+      for (let i = 0; i < this.productDesigns.length; i++) {
+        uploadData.append(`product_designs[${i}][color]`, this.productDesigns[i].color.id)
+        uploadData.append(`product_designs[${i}][size]`, this.productDesigns[i].size)
+        uploadData.append(`product_designs[${i}][quantity]`, this.productDesigns[i].quantity)
       }
 
-      return axios.post(process.env.API + '/image', uploadData, config)
+      // append images
+      for (let i = 0; i < images.length; i++) {
+        uploadData.append(`images[${i}]`, images[i])
+      }
+
+      return uploadData
     },
 
     showErrors (errors) {
@@ -358,7 +372,8 @@ export default {
         category_id: this.selectedSubcategory,
         brand_id: this.productBrand,
         material: this.productMaterial,
-        product_designs: this.productDesigns
+        product_designs: this.productDesigns,
+        image: this.$refs.uploader.files
       }
     }
   }

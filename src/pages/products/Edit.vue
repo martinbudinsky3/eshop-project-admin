@@ -123,7 +123,7 @@
             <ul class="ls-none">
               <li class="cursor-pointer q-px-sm d-inline" v-for="(image, index) in originalImages" :key="index">
                 <q-img
-                  :src="'http://wtech-eshop.test/' + image.path"
+                  :src="'http://eshop-project.test/' + image.path"
                   spinner-color="grey"
                   class="image-item"
                 >

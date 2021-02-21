@@ -64,7 +64,7 @@ module.exports = function (/* ctx */) {
       // extractCSS: false,
 
       env: {
-        API: 'http://wtech-eshop.test'
+        API: 'http://eshop-project.test/api'
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack
