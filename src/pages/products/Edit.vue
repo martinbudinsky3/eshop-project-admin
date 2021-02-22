@@ -367,16 +367,6 @@ export default {
       })
 
     axios
-      .get(process.env.API + '/image/' + this.$route.params.id)
-      .then(response => {
-        this.originalImages = response.data
-      })
-      .catch(error => {
-        this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní obrázkov.' })
-        console.log(error)
-      })
-
-    axios
       .get(process.env.API + '/category')
       .then(response => {
         this.mainCategories = response.data
@@ -385,14 +375,18 @@ export default {
         axios
           .get(process.env.API + '/products/' + this.$route.params.id + '/edit')
           .then(response => {
-            this.productName = response.data.name
-            this.productPrice = response.data.price
-            this.productMaterial = response.data.material
-            this.productDescription = response.data.description
-            this.selectedMainCategory = this.mainCategories.find(category => category.id === response.data.categories[0].parent_categories[0].id)
-            this.selectedSubcategory = this.selectedMainCategory.child_categories.find(category => category.id === response.data.categories[0].id).id
-            this.productBrand = response.data.brand.id
-            this.productDesigns = response.data.product_designs
+            const product = response.data.product
+
+            this.productName = product.name
+            this.productPrice = product.price
+            this.productMaterial = product.material
+            this.productDescription = product.description
+            this.selectedMainCategory = this.mainCategories.find(category => category.id === product.categories[0].parent_categories[0].id)
+            this.selectedSubcategory = this.selectedMainCategory.child_categories.find(category => category.id === product.categories[0].id).id
+            this.productBrand = product.brand.id
+            this.productDesigns = product.product_designs
+
+            this.originalImages = response.data.images
           })
           .catch(error => {
             this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní produktu.' })
