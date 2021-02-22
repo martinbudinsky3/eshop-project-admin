@@ -213,43 +213,63 @@ export default {
       if (this.$refs.uploader.files.length === 0 && this.originalImages.length === 0) {
         this.imageError = true
       } else {
+        this.imageError = false
+        const config = { headers: { contentType: 'multipart/form-data' } }
+        const uploadData = this.createFormData()
+
         axios
-          .put(process.env.API + '/products/' + this.$route.params.id, this.productData)
-          .then(response => {
-            return this.uploadImages()
-          })
-          .then(() => {
+          .post(process.env.API + '/products/' + this.$route.params.id, uploadData, config)
+          .then((response) => {
+            console.log(response)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol upravený.' })
           })
           .catch(error => {
             if (error.response.data.errors) {
               this.showErrors(error.response.data.errors)
             }
+            console.log(error.response.data)
             this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nastala chyba.' })
             console.log(error)
           })
       }
     },
 
-    uploadImages () {
-      if (this.$refs.uploader.files.length === 0) {
-        return new Promise((resolve, reject) => {
-          setTimeout(function () {
-            resolve('Success!')
-          }, 250)
-        })
-      }
-
-      const config = { headers: { contentType: 'multipart/form-data' } }
+    createFormData () {
       const uploadData = new FormData()
       const images = this.$refs.uploader.files
 
-      uploadData.append('productId', this.$route.params.id)
-      for (let i = 0; i < images.length; i++) {
-        uploadData.append(`image[${i}]`, images[i])
+      uploadData.append('name', this.productName)
+      uploadData.append('description', this.productDescription)
+      uploadData.append('price', this.productPrice)
+      uploadData.append('category_id', this.selectedSubcategory)
+      uploadData.append('brand_id', this.productBrand)
+      uploadData.append('material', this.productMaterial)
+
+      // append new or edited product designs
+      for (let i = 0; i < this.productDesigns.length; i++) {
+        uploadData.append(`product_designs[${i}][color]`, this.productDesigns[i].color.id)
+        uploadData.append(`product_designs[${i}][size]`, this.productDesigns[i].size)
+        uploadData.append(`product_designs[${i}][quantity]`, this.productDesigns[i].quantity)
       }
 
-      return axios.post(process.env.API + '/image', uploadData, config)
+      // append deleted product designs
+      for (let i = 0; i < this.deletedDesigns.length; i++) {
+        uploadData.append(`deleted_designs[${i}][id]`, this.deletedDesigns[i].id)
+      }
+
+      // append new images
+      for (let i = 0; i < images.length; i++) {
+        uploadData.append(`images[${i}]`, images[i])
+      }
+
+      // append deleted images
+      for (let i = 0; i < this.deletedImages.length; i++) {
+        uploadData.append(`deleted_images[${i}][id]`, this.deletedImages[i].id)
+      }
+
+      uploadData.append('_method', 'put')
+
+      return uploadData
     },
 
     showErrors (errors) {

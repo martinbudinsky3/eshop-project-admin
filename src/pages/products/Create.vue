@@ -9,7 +9,7 @@
               maxlength="255"
               counter
               v-model="productName"
-              error-message="Pole cena je povinné."
+              error-message="Pole názov je povinné."
               :error="nameError"
             />
             <q-input
@@ -117,7 +117,6 @@
               </li>
             </ul>
             <p class="text-red-9 text-weight-bold" :class="{'hidden': !designError}">Aspoň jeden variant je povinný.</p>
-            <p class="text-red-9 text-weight-bold" :class="{'hidden': !designError}">V každom variante sú povinné všetky polia.</p>
           </q-card-section>
           <q-card-section class="text-h6">Obrázky</q-card-section>
           <q-card-section>
@@ -186,36 +185,27 @@ export default {
 
   methods: {
     createProduct () {
-      // hide error labels
-      this.hideErrors()
+      const config = { headers: { contentType: 'multipart/form-data' } }
+      const uploadData = this.createFormData()
 
-      // if there are no uploaded images don't send request
-      if (this.$refs.uploader.files.length === 0) {
-        this.imageError = true
-      } else {
-        this.imageError = false
-        const config = { headers: { contentType: 'multipart/form-data' } }
-        const uploadData = this.createFormData()
+      axios
+        .post(process.env.API + '/products', uploadData, config)
+        .then(response => {
+          this.productId = response.data.id
+        })
+        .then(() => {
+          this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
+          this.$router.push({ path: '/products/' + this.productId + '/edit' })
+        })
+        .catch(error => {
+          if (error.response.data.errors) {
+            console.log(error.response.data.errors)
+            this.showErrors(error.response.data.errors)
+          }
 
-        axios
-          .post(process.env.API + '/products', uploadData, config)
-          .then(response => {
-            this.productId = response.data.id
-          })
-          .then(() => {
-            this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol úspešne vytvorený.' })
-            this.$router.push({ path: '/products/' + this.productId + '/edit' })
-          })
-          .catch(error => {
-            if (error.response.data.errors) {
-              console.log(error.response.data.errors)
-              this.showErrors(error.response.data.errors)
-            }
-
-            console.log(error)
-            this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
-          })
-      }
+          console.log(error)
+          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
+        })
     },
 
     createFormData () {
@@ -269,6 +259,10 @@ export default {
 
       if (errors.product_designs) {
         this.designError = true
+      }
+
+      if (errors.images) {
+        this.imageError = true
       }
     },
 
