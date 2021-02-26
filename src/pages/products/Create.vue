@@ -112,13 +112,13 @@
             <ul class="ls-none">
               <li class="cursor-pointer" v-for="(design, index) in productDesigns" :key="index"
                 @click="editDesign(index)">
-                  <q-chip removable  color="white" @remove="removeDesign(design)">
+                  <q-chip removable color="white" class="q-pl-none q-ml-none" @remove="removeDesign(design)">
                     {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
                   </q-chip>
-                   <div :ref="'design'+index"></div>
+                   <div class="errors" :ref="'design'+index"></div>
               </li>
             </ul>
-            <p class="text-red-9" :class="{'hidden': !designError}">Aspoň jeden variant je povinný.</p>
+            <p class="errors" :class="{'hidden': !designError}">The product designs field is required</p>
           </q-card-section>
           <q-card-section class="text-h6">Obrázky</q-card-section>
           <q-card-section>
@@ -132,7 +132,7 @@
               batch
               ref="uploader"
               />
-            <p class="text-red-9" :class="{'hidden': !imageError}">{{ imageErrorMessage }}</p>
+            <div class="errors" ref="imageErrors"></div>
           </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
@@ -187,8 +187,7 @@ export default {
       priceErrorMessage: '',
       brandErrorMessage: '',
       materialErrorMessage: '',
-      descriptionErrorMessage: '',
-      imageErrorMessage: ''
+      descriptionErrorMessage: ''
     }
   },
 
@@ -276,8 +275,7 @@ export default {
       }
 
       if (errors.images) {
-        this.imageErrorMessage = errors.images[0]
-        this.imageError = true
+        this.showImageErrors(errors.images)
       }
     },
 
@@ -294,6 +292,20 @@ export default {
       }
     },
 
+    showImageErrors (imageErrors) {
+      const div = this.$refs.imageErrors
+
+      for (const value of Object.values(imageErrors)) {
+        if (typeof value === 'object') {
+          for (const message of Object.values(value)) {
+            div.innerHTML += `<p>${message[0]}</p>`
+          }
+        } else {
+          div.innerHTML += `<p>${value}</p>`
+        }
+      }
+    },
+
     hideErrors () {
       this.nameError = false
       this.priceError = false
@@ -304,14 +316,19 @@ export default {
       this.imageError = false
 
       this.hideDesignErrors()
+      this.hideImageErrors()
     },
 
     hideDesignErrors () {
       for (let i = 0; i < this.productDesigns.length; i++) {
         const div = this.$refs['design' + i][0]
         div.innerHTML = ''
-        console.log(div)
       }
+    },
+
+    hideImageErrors () {
+      const div = this.$refs.imageErrors
+      div.innerHTML = ''
     },
 
     setSubcategory () {
