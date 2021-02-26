@@ -9,7 +9,7 @@
               maxlength="255"
               counter
               v-model="productName"
-              error-message="Pole názov je povinné."
+              :error-message="nameErrorMessage"
               :error="nameError"
             />
             <q-input
@@ -19,7 +19,7 @@
               v-model="productPrice"
               step="any"
               min=0
-              error-message="Pole cena je povinné."
+              :error-message="priceErrorMessage"
               :error="priceError"
               />
             <q-select
@@ -50,7 +50,7 @@
               v-model="productBrand"
               :options="brands"
               label="Značka"
-              error-message="Pole značka je povinné."
+              :error-message="brandErrorMessage"
               :error="brandError"
               />
             <q-input
@@ -59,7 +59,7 @@
               maxlength="100"
               counter
               v-model="productMaterial"
-              error-message="Pole materiál je povinné."
+              :error-message="materialErrorMessage"
               :error="materialError"
               />
             <q-input
@@ -69,7 +69,7 @@
               v-model="productDescription"
               :max-height="100"
               rows="7"
-              error-message="Pole popis je povinné."
+              :error-message="descriptionErrorMessage"
               :error="descriptionError"
             />
           </q-card-section>
@@ -110,13 +110,15 @@
             </q-dialog>
 
             <ul class="ls-none">
-              <li class="cursor-pointer" v-for="(design, index) in productDesigns" :key="index" @click="editDesign(index)">
-                <q-chip removable  color="white" @remove="removeDesign(design)">
-                  {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
-                </q-chip>
+              <li class="cursor-pointer" v-for="(design, index) in productDesigns" :key="index"
+                @click="editDesign(index)">
+                  <q-chip removable  color="white" @remove="removeDesign(design)">
+                    {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
+                  </q-chip>
+                   <div :ref="'design'+index"></div>
               </li>
             </ul>
-            <p class="text-red-9 text-weight-bold" :class="{'hidden': !designError}">Aspoň jeden variant je povinný.</p>
+            <p class="text-red-9" :class="{'hidden': !designError}">Aspoň jeden variant je povinný.</p>
           </q-card-section>
           <q-card-section class="text-h6">Obrázky</q-card-section>
           <q-card-section>
@@ -130,7 +132,7 @@
               batch
               ref="uploader"
               />
-            <p class="text-red-9 text-weight-bold" :class="{'hidden': !imageError}">Aspoň jeden obrázok je povinný.</p>
+            <p class="text-red-9" :class="{'hidden': !imageError}">{{ imageErrorMessage }}</p>
           </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
@@ -179,7 +181,14 @@ export default {
       materialError: false,
       descriptionError: false,
       designError: false,
-      imageError: false
+      imageError: false,
+
+      nameErrorMessage: '',
+      priceErrorMessage: '',
+      brandErrorMessage: '',
+      materialErrorMessage: '',
+      descriptionErrorMessage: '',
+      imageErrorMessage: ''
     }
   },
 
@@ -238,31 +247,50 @@ export default {
       this.hideErrors()
 
       if (errors.brand_id) {
+        this.brandErrorMessage = errors.brand_id[0]
         this.brandError = true
       }
 
       if (errors.description) {
+        this.descriptionErrorMessage = errors.description[0]
         this.descriptionError = true
       }
 
       if (errors.material) {
+        this.materialErrorMessage = errors.material[0]
         this.materialError = true
       }
 
       if (errors.name) {
+        this.nameErrorMessage = errors.name[0]
         this.nameError = true
       }
 
       if (errors.price) {
+        this.priceErrorMessage = errors.price[0]
         this.priceError = true
       }
 
       if (errors.product_designs) {
-        this.designError = true
+        this.showDesignsErrors(errors.product_designs)
       }
 
       if (errors.images) {
+        this.imageErrorMessage = errors.images[0]
         this.imageError = true
+      }
+    },
+
+    showDesignsErrors (designErrors) {
+      for (const [key, value] of Object.entries(designErrors)) {
+        if (typeof value === 'object') {
+          for (const message of Object.values(value)) {
+            const div = this.$refs['design' + key][0]
+            div.innerHTML += `<p class="text-red-9">${message[0]}</p>`
+          }
+        } else {
+          this.designError = true
+        }
       }
     },
 
@@ -274,6 +302,16 @@ export default {
       this.descriptionError = false
       this.designError = false
       this.imageError = false
+
+      this.hideDesignErrors()
+    },
+
+    hideDesignErrors () {
+      for (let i = 0; i < this.productDesigns.length; i++) {
+        const div = this.$refs['design' + i][0]
+        div.innerHTML = ''
+        console.log(div)
+      }
     },
 
     setSubcategory () {
@@ -358,18 +396,7 @@ export default {
       })
   },
   computed: {
-    productData: function () {
-      return {
-        name: this.productName,
-        description: this.productDescription,
-        price: this.productPrice,
-        category_id: this.selectedSubcategory,
-        brand_id: this.productBrand,
-        material: this.productMaterial,
-        product_designs: this.productDesigns,
-        image: this.$refs.uploader.files
-      }
-    }
+
   }
 }
 </script>
