@@ -1,7 +1,11 @@
 <template>
 <div class="q-my-xl">
     <q-card>
-        <q-card-section class="text-h5">Vytvorenie nového produktu</q-card-section>
+        <q-card-section>
+          <h1 class="text-h5">
+            Vytvorenie nového produktu
+          </h1>
+        </q-card-section>
         <q-card-section>
             <q-input
               class="q-mb-sm"
@@ -73,16 +77,13 @@
               :error="descriptionError"
             />
           </q-card-section>
-          <q-card-section class=text-h6>Varianty produktu</q-card-section>
           <q-card-section>
+            <h2 class="text-h6">Varianty produktu</h2>
             <q-btn class="q-mb-sm" label="Pridať variant" color="primary" @click="createDesign()" />
             <q-dialog v-model="modal" persistent>
               <q-card class="design-modal">
                 <q-card-section>
-                  <div class="text-h6">Variant produktu</div>
-                </q-card-section>
-
-                <q-card-section class="q-pt-none">
+                  <h2 class="text-h6">Variant produktu</h2>
                   <q-select
                     class="q-mb-sm"
                     option-value="id"
@@ -118,10 +119,10 @@
                    <div class="errors" :ref="'design'+index"></div>
               </li>
             </ul>
-            <p class="errors" :class="{'hidden': !designError}">The product designs field is required</p>
+            <p class="errors" :class="{'hidden': !designError}">{{ designErrorMessage }}</p>
           </q-card-section>
-          <q-card-section class="text-h6">Obrázky</q-card-section>
           <q-card-section>
+            <h2 class="text-h6">Obrázky</h2>
             <q-uploader
               url=""
               max-file-size="307200"
@@ -132,7 +133,7 @@
               batch
               ref="uploader"
               />
-            <div class="errors" ref="imageErrors"></div>
+            <p class="errors" :class="{'hidden': !imageError}">{{ imageErrorMessage }}</p>
           </q-card-section>
         <q-card-actions class="q-mt-md">
             <div class="row justify-end full-width docs-btn">
@@ -145,8 +146,8 @@
 </template>
 
 <style lang="stylus">
-.docs-btn .q-btn
-    padding 15px 20px
+  .docs-btn .q-btn
+      padding 15px 20px
 </style>
 
 <script>
@@ -187,12 +188,16 @@ export default {
       priceErrorMessage: '',
       brandErrorMessage: '',
       materialErrorMessage: '',
-      descriptionErrorMessage: ''
+      descriptionErrorMessage: '',
+      designErrorMessage: '',
+      imageErrorMessage: ''
     }
   },
 
   methods: {
     createProduct () {
+      this.hideErrors()
+
       const config = { headers: { contentType: 'multipart/form-data' } }
       const uploadData = this.createFormData()
 
@@ -211,8 +216,8 @@ export default {
             this.showErrors(error.response.data.errors)
           }
 
-          console.log(error)
           this.$q.notify({ type: 'negative', timeout: 2000, message: 'Vyskytla sa chyba - nie je možné vytvoriť produkt.' })
+          console.log(error)
         })
     },
 
@@ -223,8 +228,8 @@ export default {
       uploadData.append('name', this.productName)
       uploadData.append('description', this.productDescription)
       uploadData.append('price', this.productPrice)
-      uploadData.append('category_id', this.selectedSubcategory)
-      uploadData.append('brand_id', this.productBrand)
+      uploadData.append('category', this.selectedSubcategory)
+      uploadData.append('brand', this.productBrand)
       uploadData.append('material', this.productMaterial)
 
       // append product designs
@@ -243,10 +248,8 @@ export default {
     },
 
     showErrors (errors) {
-      this.hideErrors()
-
-      if (errors.brand_id) {
-        this.brandErrorMessage = errors.brand_id[0]
+      if (errors.brand) {
+        this.brandErrorMessage = errors.brand[0]
         this.brandError = true
       }
 
@@ -275,7 +278,8 @@ export default {
       }
 
       if (errors.images) {
-        this.showImageErrors(errors.images)
+        this.imageErrorMessage = errors.images[0]
+        this.imageError = true
       }
     },
 
@@ -287,21 +291,8 @@ export default {
             div.innerHTML += `<p class="text-red-9">${message[0]}</p>`
           }
         } else {
+          this.designErrorMessage = designErrors[0]
           this.designError = true
-        }
-      }
-    },
-
-    showImageErrors (imageErrors) {
-      const div = this.$refs.imageErrors
-
-      for (const value of Object.values(imageErrors)) {
-        if (typeof value === 'object') {
-          for (const message of Object.values(value)) {
-            div.innerHTML += `<p>${message[0]}</p>`
-          }
-        } else {
-          div.innerHTML += `<p>${value}</p>`
         }
       }
     },
@@ -314,9 +305,7 @@ export default {
       this.descriptionError = false
       this.designError = false
       this.imageError = false
-
       this.hideDesignErrors()
-      this.hideImageErrors()
     },
 
     hideDesignErrors () {
@@ -324,11 +313,6 @@ export default {
         const div = this.$refs['design' + i][0]
         div.innerHTML = ''
       }
-    },
-
-    hideImageErrors () {
-      const div = this.$refs.imageErrors
-      div.innerHTML = ''
     },
 
     setSubcategory () {

@@ -8,7 +8,7 @@
       @request="request"
       :filter="filter"
       :columns="columns"
-      title="List of products"
+      title="Zoznam produktov"
       binary-state-sort
       >
       <template v-slot:top-right>
