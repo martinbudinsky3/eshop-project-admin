@@ -252,7 +252,9 @@ export default {
 
       // append new or edited product designs
       for (let i = 0; i < this.productDesigns.length; i++) {
-        uploadData.append(`product_designs[${i}][id]`, this.productDesigns[i].id)
+        if (this.productDesigns[i].id !== undefined) {
+          uploadData.append(`product_designs[${i}][id]`, this.productDesigns[i].id)
+        }
         uploadData.append(`product_designs[${i}][color]`, this.productDesigns[i].color.id)
         uploadData.append(`product_designs[${i}][size]`, this.productDesigns[i].size)
         uploadData.append(`product_designs[${i}][quantity]`, this.productDesigns[i].quantity)
