@@ -32,6 +32,20 @@ const routes = [
         component: () => import('pages/products/Edit')
       }
     ]
+  },
+  {
+    path: '/questions',
+    component: () => import('layouts/Main'),
+    children: [
+      {
+        path: 'index',
+        component: () => import('pages/questions/Index')
+      },
+      {
+        path: 'create',
+        component: () => import('pages/questions/Create')
+      }
+    ]
   }
 ]
 
