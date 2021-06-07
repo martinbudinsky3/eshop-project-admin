@@ -46,6 +46,20 @@ const routes = [
         component: () => import('pages/questions/Create')
       }
     ]
+  },
+  {
+    path: '/questions/:id',
+    component: () => import('layouts/Main'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/questions/ShowResults')
+      },
+      {
+        path: 'edit',
+        component: () => import('pages/questions/Edit')
+      }
+    ]
   }
 ]
 
