@@ -5,7 +5,7 @@
       row-key="id"
       :pagination.sync="serverPagination"
       :loading="loading"
-      @request="request"
+      @request="fetchQuestions"
       :filter="filter"
       :columns="columns"
       title="Zoznam ankiet"
@@ -22,20 +22,20 @@
         <q-td key="id" :props="props">
           <span>{{ props.row.id }}</span>
         </q-td>
-        <q-td key="questionText" :props="props">
+        <q-td key="text" :props="props">
           <span>{{ props.row.text }}</span>
         </q-td>
-        <q-td key="dateFrom" :props="props">
+        <q-td key="date_from" :props="props">
           <span>{{ props.row.date_from }}</span>
         </q-td>
-        <q-td key="dateTo" :props="props">
+        <q-td key="date_to" :props="props">
           <span>{{ props.row.date_to }}</span>
         </q-td>
         <q-td class="text-right">
           <div>
             <q-btn round icon="visibility" class="q-mr-xs" @click="$router.push('/questions/' + props.row.id)" />
-            <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/products/' + props.row.id + '/edit')" />
-            <q-btn round icon="delete" @click="destroy(props.row.id)"/>
+            <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/questions/' + props.row.id + '/edit')" />
+            <q-btn round icon="delete" @click="showDeleteDialog(props.row.id)"/>
           </div>
         </q-td>
       </q-tr>
@@ -50,9 +50,9 @@ export default {
   data () {
     return {
       columns: [
-        { name: 'questionText', label: 'Otázka ankety', field: 'text', sortable: false, align: 'left' },
-        { name: 'dateFrom', label: 'Platnosť dátum od', field: 'date_from', sortable: true, align: 'left' },
-        { name: 'dateTo', label: 'Platnosť dátum do', field: 'date_to', sortable: true, align: 'left' },
+        { name: 'text', label: 'Otázka ankety', field: 'text', sortable: false, align: 'left' },
+        { name: 'date_from', label: 'Platnosť dátum od', field: 'date_from', sortable: true, align: 'left' },
+        { name: 'date_to', label: 'Platnosť dátum do', field: 'date_to', sortable: false, align: 'left' },
         { name: 'actions', label: 'Akcie', sortable: false, align: 'right' }
       ],
       selected: [],
@@ -61,7 +61,7 @@ export default {
         page: 1,
         rowsNumber: 10, // the number of total rows in DB
         rowsPerPage: 5,
-        sortBy: 'dateFrom',
+        sortBy: 'date_from',
         descending: false
       },
       filter: '',
@@ -69,7 +69,7 @@ export default {
     }
   },
   methods: {
-    request ({ pagination }) {
+    fetchQuestions ({ pagination }) {
       // QTable to "loading" state
       this.loading = true
       // fetch data
@@ -97,7 +97,7 @@ export default {
         })
     },
 
-    destroy (id) {
+    showDeleteDialog (id) {
       this.$q.dialog({
         title: 'Odstránenie',
         message: 'Naozaj chcete odstrániť anketu?',
@@ -108,7 +108,7 @@ export default {
         axios
           .delete(process.env.API + `/questions/${id}`)
           .then(() => {
-            this.request(this.requestParams)
+            this.fetchQuestions(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Anketa bola odstránená.' })
           })
           .catch(error => {
@@ -120,7 +120,7 @@ export default {
   },
   mounted () {
     // once mounted, we need to trigger the initial server data fetch
-    this.request(this.requestParams)
+    this.fetchQuestions(this.requestParams)
   },
   computed: {
     requestParams: function () {
