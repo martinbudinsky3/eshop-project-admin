@@ -107,7 +107,7 @@ export default {
         this.dateFromError = true
       }
 
-      if (errors.material) {
+      if (errors.date_to) {
         this.dateToErrorMessage = errors.date_to[0]
         this.dateToError = true
       }
