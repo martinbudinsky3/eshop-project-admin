@@ -1,6 +1,6 @@
 <template>
-<div class="q-my-xl">
-<q-table
+  <div class="q-my-xl">
+    <q-table
       :data="questions"
       row-key="id"
       :pagination.sync="serverPagination"
@@ -40,7 +40,7 @@
         </q-td>
       </q-tr>
     </q-table>
-</div>
+  </div>
 </template>
 
 <script>

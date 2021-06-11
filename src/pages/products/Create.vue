@@ -173,7 +173,7 @@ export default {
       colors: [],
       sizes: [],
       modal: false,
-      productId: 2,
+      productId: 0,
 
       // error flags
       nameError: false,
