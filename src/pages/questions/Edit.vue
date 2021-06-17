@@ -42,6 +42,8 @@
           </div>
         </q-card-actions>
       </q-card>
+
+      <answer-list></answer-list>
   </div>
 </template>
 
@@ -52,8 +54,10 @@
 
 <script>
 import axios from 'axios'
+import AnswerList from 'src/components/AnswerList.vue'
 
 export default {
+  components: { AnswerList },
   data () {
     return {
       questionText: '',

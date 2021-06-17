@@ -6,6 +6,8 @@
         :loading="loading"
         @request="fetchAnswers"
         :columns="columns"
+        :pagination.sync="pagination"
+        :hide-pagination="true"
         title="Zoznam možných odpovedí"
         binary-state-sort
         >
@@ -25,6 +27,10 @@
         </q-tr>
     </q-table>
 
+    <div class="row justify-end full-width docs-btn q-mt-md">
+      <q-btn label="Pridať odpoveď" color="primary" @click="showCreateAnswerModal"/>
+    </div>
+
     <q-dialog v-model="modal" persistent>
       <q-card class="design-modal">
         <q-card-section>
@@ -33,7 +39,9 @@
           <q-input
             type="text"
             label="Text odpovedi"
-            v-model="answerText"/>
+            v-model="answerText"
+            :error-message="answerTextErrorMessage"
+            :error="answerTextError"/>
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
@@ -42,12 +50,12 @@
             v-show="creatingAnswer"
             color="primary"
             label="Pridať"
-            v-close-popup @click="createAnswer()"/>
+            @click="createAnswer()"/>
           <q-btn
             v-show="!creatingAnswer"
             color="primary"
             label="Upraviť"
-            v-close-popup @click="editAnswer()"/>
+            @click="editAnswer()"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -64,6 +72,10 @@ export default {
         { name: 'text', label: 'Možná odpoveď', field: 'text', sortable: false, align: 'left' },
         { name: 'actions', label: 'Akcie', sortable: false, align: 'right' }
       ],
+      pagination: {
+        page: 1,
+        rowsPerPage: 0
+      },
       loading: false,
       selected: [],
       answers: [],
@@ -79,20 +91,15 @@ export default {
   },
   methods: {
     fetchAnswers () {
-      // QTable to "loading" state
       this.loading = true
-      // fetch data
-      axios
-        .get(`${process.env.API}/questions/${this.filter}/answers`)
-        .then(({ data }) => {
-          // we update the rows with the fetched ones
-          this.questions = data.answers
 
-          // finally we tell QTable to exit the "loading" state
+      axios
+        .get(`${process.env.API}/questions/${this.$route.params.id}/answers`)
+        .then(({ data }) => {
+          this.answers = data.answers
           this.loading = false
         })
         .catch(error => {
-          // there's an error... do SOMETHING
           console.log(error)
           this.$q.notify({
             type: 'negative',
@@ -100,26 +107,26 @@ export default {
             message: 'Nepodarilo sa načítať zoznam odpovedí.'
           })
 
-          // we tell QTable to exit the "loading" state
           this.loading = false
         })
     },
 
     createAnswer () {
       axios
-        .post(process.env.API + '/products', this.answerData)
-        .then(() => {
+        .post(`${process.env.API}/questions/${this.$route.params.id}/answers`, this.answerData)
+        .then((id) => {
           this.$q.notify({
             type: 'positive',
             timeout: 2000,
             message: 'Odpoveď bola úspešne pridaná.'
           })
           this.clearAnswerForm()
+          this.fetchAnswers()
         })
         .catch(error => {
-          // if (error.response.data.errors) {
-          //  this.showErrors(error.response.data.errors)
-          // }
+          if (error.response.data.errors) {
+            this.showErrors(error.response.data.errors)
+          }
           this.$q.notify({
             type: 'negative',
             timeout: 2000,
@@ -131,19 +138,20 @@ export default {
 
     editAnswer () {
       axios
-        .put(`${process.env.API}/questions/${this.editedAnswerId}`, this.answerData)
+        .put(`${process.env.API}/answers/${this.editedAnswerId}`, this.answerData)
         .then(() => {
-          this.fetchAnswers()
           this.$q.notify({
             type: 'positive',
             timeout: 2000,
             message: 'Odpoveď bola úspešne upravená.'
           })
+          this.clearAnswerForm()
+          this.fetchAnswers()
         })
         .catch(error => {
-          // if (error.response.data.errors) {
-          //  this.showErrors(error.response.data.errors)
-          // }
+          if (error.response.data.errors) {
+            this.showErrors(error.response.data.errors)
+          }
           this.$q.notify({
             type: 'negative',
             timeout: 2000,
@@ -166,12 +174,14 @@ export default {
     },
 
     showCreateAnswerModal () {
+      this.hideErrors()
       this.creatingAnswer = true
       this.modal = true
       this.answerText = ''
     },
 
     showEditAnswerModal (answer) {
+      this.hideErrors()
       this.creatingAnswer = false
       this.modal = true
       this.answerText = answer.text
@@ -193,13 +203,14 @@ export default {
           this.$q.notify({
             type: 'negative',
             timeout: 2000,
-            message: 'Nastala chyba.'
+            message: 'Nepodarilo sa odstrániť odpoveď.'
           })
           console.log(error)
         })
     },
 
     clearAnswerForm () {
+      this.hideErrors()
       this.modal = false
       this.answerText = ''
     },
@@ -207,11 +218,14 @@ export default {
     showErrors (errors) {
       this.answerTextErrorMessage = errors.text[0]
       this.answerTextError = true
+    },
+
+    hideErrors () {
+      this.answerTextError = false
     }
   },
 
   mounted () {
-    // once mounted, we need to trigger the initial server data fetch
     this.fetchAnswers()
   },
 
