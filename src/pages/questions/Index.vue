@@ -11,13 +11,6 @@
       title="Zoznam ankiet"
       binary-state-sort
       >
-      <!--template v-slot:top-right>
-        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template-->
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td key="id" :props="props">
           <span>{{ props.row.id }}</span>

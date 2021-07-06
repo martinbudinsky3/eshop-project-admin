@@ -354,6 +354,7 @@ export default {
     }
   },
   mounted () {
+    // TODO refactoring - split to multiple methods
     axios
       .get(process.env.API + '/category')
       .then(response => {
