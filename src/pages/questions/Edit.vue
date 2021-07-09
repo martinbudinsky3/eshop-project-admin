@@ -1,5 +1,8 @@
 <template>
   <div class="q-my-xl">
+    <div v-if="answersCount < 2" class="q-pa-md q-mb-md alert-warning">
+      Aby sa anketa zobrazila v klientskej časti musí mať aspoň 2 možné odpovede.
+    </div>
     <q-card>
         <q-card-section>
           <h1 class="text-h5">
@@ -43,7 +46,7 @@
         </q-card-actions>
       </q-card>
 
-      <answer-list></answer-list>
+      <answer-list ref="answer-list" @answers-fetched="saveAnswersCount"></answer-list>
   </div>
 </template>
 
@@ -63,6 +66,8 @@ export default {
       questionText: '',
       dateFrom: null,
       dateTo: null,
+
+      answersCount: 2,
 
       // error flags
       questionTextError: false,
@@ -117,6 +122,11 @@ export default {
       this.questionTextError = false
       this.dateFromError = false
       this.dateToError = false
+    },
+
+    saveAnswersCount (answersCount) {
+      this.answersCount = answersCount
+      console.log(this.answersCount)
     }
   },
 
@@ -124,7 +134,6 @@ export default {
     axios
       .get(process.env.API + '/questions/' + this.$route.params.id + '/edit')
       .then(response => {
-        console.log(response)
         this.questionText = response.data.text
         this.dateFrom = response.data.date_from
         this.dateTo = response.data.date_to

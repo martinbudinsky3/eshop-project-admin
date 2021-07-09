@@ -40,6 +40,7 @@
             type="text"
             label="Text odpovedi"
             v-model="answerText"
+            autogrow
             :error-message="answerTextErrorMessage"
             :error="answerTextError"/>
         </q-card-section>
@@ -97,6 +98,7 @@ export default {
         .get(`${process.env.API}/questions/${this.$route.params.id}/answers`)
         .then(({ data }) => {
           this.answers = data.answers
+          this.$emit('answers-fetched', this.answers.length)
           this.loading = false
         })
         .catch(error => {

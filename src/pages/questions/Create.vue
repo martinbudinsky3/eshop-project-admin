@@ -12,6 +12,7 @@
             type="textarea"
             label="Text otázky"
             counter
+            autogrow
             v-model="questionText"
             :error-message="questionTextErrorMessage"
             :error="questionTextError"
