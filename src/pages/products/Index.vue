@@ -58,7 +58,7 @@ export default {
         rowsNumber: 10, // the number of total rows in DB
         rowsPerPage: 5,
         sortBy: 'name',
-        descending: true
+        descending: false
       },
       filter: '',
       serverData: []
