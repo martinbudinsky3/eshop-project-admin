@@ -79,50 +79,6 @@
             />
           </q-card-section>
           <q-card-section>
-            <h2 class="text-h6">Varianty produktu</h2>
-            <q-btn class="q-mb-sm" label="Pridať variant" color="primary" @click="createDesign()" />
-            <q-dialog v-model="modal" persistent>
-              <q-card class="design-modal">
-                <q-card-section>
-                  <h2 class="text-h6">Variant produktu</h2>
-                  <q-select
-                    class="q-mb-sm"
-                    option-value="id"
-                    option-label="name"
-                    v-model="productDesignColor"
-                    :options="colors"
-                    label="Farba"/>
-                  <q-select
-                    class="q-mb-sm"
-                    v-model="productDesignSize"
-                    :options="sizes"
-                    label="Veľkost" />
-                  <q-input
-                    type="number"
-                    label="Množstvo"
-                    v-model="productDesignQuantity"
-                    min=0 />
-                </q-card-section>
-
-                <q-card-actions align="right" class="text-primary">
-                  <q-btn flat label="Späť" v-close-popup />
-                  <q-btn color="primary" label="Pridať" v-close-popup @click="saveDesign()"/>
-                </q-card-actions>
-              </q-card>
-            </q-dialog>
-
-            <ul class="ls-none">
-              <li class="cursor-pointer" v-for="(design, index) in productDesigns" :key="index"
-                @click="editDesign(index)">
-                  <q-chip removable color="white" class="q-pl-none q-ml-none" @remove="removeDesign(design)">
-                    {{ design.color.name }} - {{ design.size }} - {{ design.quantity }}ks
-                  </q-chip>
-                   <div class="errors" :ref="'design'+index"></div>
-              </li>
-            </ul>
-            <p class="errors" :class="{'hidden': !designError}">{{ designErrorMessage }}</p>
-          </q-card-section>
-          <q-card-section>
             <h2 class="text-h6">Obrázky</h2>
             <q-uploader
               url=""
@@ -164,16 +120,8 @@ export default {
       productPrice: '',
       productMaterial: '',
       productBrand: '',
-      productDesignColor: null,
-      productDesignSize: '',
-      productDesignQuantity: '',
-      updatedProductDesignIndex: '',
       mainCategories: [],
-      productDesigns: [],
       brands: [],
-      colors: [],
-      sizes: [],
-      modal: false,
       productId: 0,
 
       // error flags
@@ -182,7 +130,6 @@ export default {
       brandError: false,
       materialError: false,
       descriptionError: false,
-      designError: false,
       imageError: false,
 
       nameErrorMessage: '',
@@ -190,7 +137,6 @@ export default {
       brandErrorMessage: '',
       materialErrorMessage: '',
       descriptionErrorMessage: '',
-      designErrorMessage: '',
       imageErrorMessage: ''
     }
   },
@@ -213,7 +159,6 @@ export default {
         })
         .catch(error => {
           if (error.response.data.errors) {
-            console.log(error.response.data.errors)
             this.showErrors(error.response.data.errors)
           }
 
@@ -232,13 +177,6 @@ export default {
       uploadData.append('category', this.selectedSubcategory)
       uploadData.append('brand', this.productBrand)
       uploadData.append('material', this.productMaterial)
-
-      // append product designs
-      for (let i = 0; i < this.productDesigns.length; i++) {
-        uploadData.append(`product_designs[${i}][color]`, this.productDesigns[i].color.id)
-        uploadData.append(`product_designs[${i}][size]`, this.productDesigns[i].size)
-        uploadData.append(`product_designs[${i}][quantity]`, this.productDesigns[i].quantity)
-      }
 
       // append images
       for (let i = 0; i < images.length; i++) {
@@ -274,27 +212,9 @@ export default {
         this.priceError = true
       }
 
-      if (errors.product_designs) {
-        this.showDesignsErrors(errors.product_designs)
-      }
-
       if (errors.images) {
         this.imageErrorMessage = errors.images[0]
         this.imageError = true
-      }
-    },
-
-    showDesignsErrors (designErrors) {
-      for (const [key, value] of Object.entries(designErrors)) {
-        if (typeof value === 'object') {
-          for (const message of Object.values(value)) {
-            const div = this.$refs['design' + key][0]
-            div.innerHTML += `<p class="text-red-9">${message[0]}</p>`
-          }
-        } else {
-          this.designErrorMessage = designErrors[0]
-          this.designError = true
-        }
       }
     },
 
@@ -306,52 +226,10 @@ export default {
       this.descriptionError = false
       this.designError = false
       this.imageError = false
-      this.hideDesignErrors()
-    },
-
-    hideDesignErrors () {
-      for (let i = 0; i < this.productDesigns.length; i++) {
-        const div = this.$refs['design' + i][0]
-        div.innerHTML = ''
-      }
     },
 
     setSubcategory () {
       this.selectedSubcategory = this.selectedMainCategory.child_categories[0].id
-    },
-
-    createDesign () {
-      this.modal = true
-      this.updatedProductDesignIndex = ''
-      this.productDesignColor = null
-      this.productDesignSize = ''
-      this.productDesignQuantity = ''
-    },
-
-    saveDesign () {
-      if (this.updatedProductDesignIndex === '') {
-        this.productDesigns.push({
-          color: this.productDesignColor,
-          size: this.productDesignSize,
-          quantity: this.productDesignQuantity
-        })
-      } else {
-        this.productDesigns[this.updatedProductDesignIndex].color = this.productDesignColor
-        this.productDesigns[this.updatedProductDesignIndex].size = this.productDesignSize
-        this.productDesigns[this.updatedProductDesignIndex].quantity = this.productDesignQuantity
-      }
-    },
-
-    removeDesign (design) {
-      this.productDesigns = this.productDesigns.filter(item => item !== design)
-    },
-
-    editDesign (index) {
-      this.modal = true
-      this.updatedProductDesignIndex = index
-      this.productDesignColor = this.productDesigns[index].color
-      this.productDesignSize = this.productDesigns[index].size
-      this.productDesignQuantity = this.productDesigns[index].quantity
     }
   },
   mounted () {
@@ -377,29 +255,6 @@ export default {
         this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní značiek.' })
         console.log(error)
       })
-
-    axios
-      .get(process.env.API + '/color')
-      .then(response => {
-        this.colors = response.data
-      })
-      .catch(error => {
-        this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní farieb.' })
-        console.log(error)
-      })
-
-    axios
-      .get(process.env.API + '/size')
-      .then(response => {
-        this.sizes = response.data
-      })
-      .catch(error => {
-        this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní veľkostí.' })
-        console.log(error)
-      })
-  },
-  computed: {
-
   }
 }
 </script>
