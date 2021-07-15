@@ -126,7 +126,6 @@ export default {
 
     saveAnswersCount (answersCount) {
       this.answersCount = answersCount
-      console.log(this.answersCount)
     }
   },
 

@@ -1,5 +1,8 @@
 <template>
 <div class="q-my-xl">
+    <div v-if="productDesignsCount < 1" class="q-pa-md q-mb-md alert-warning">
+      Aby sa produkt zobrazil v klientskej časti musí mať aspoň 1 variant (farba, veľkosť).
+    </div>
     <q-card>
         <q-card-section>
           <h1 class="text-h5">
@@ -109,7 +112,7 @@
             </div>
         </q-card-actions>
     </q-card>
-    <product-design-list></product-design-list>
+    <product-design-list @product-designs-fetched="saveProductDesignsCount"></product-design-list>
 </div>
 </template>
 
@@ -148,6 +151,8 @@ export default {
       productId: '',
       originalImages: [],
       deletedImages: [],
+
+      productDesignsCount: 2,
 
       // error flags
       nameError: false,
@@ -265,6 +270,10 @@ export default {
     removeImage (image) {
       this.originalImages = this.originalImages.filter(item => item !== image)
       this.deletedImages.push(image)
+    },
+
+    saveProductDesignsCount (productDesignsCount) {
+      this.productDesignsCount = productDesignsCount
     }
   },
   mounted () {
