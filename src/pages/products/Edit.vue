@@ -1,7 +1,8 @@
 <template>
 <div class="q-my-xl">
     <div v-if="productDesignsCount < 1" class="q-pa-md q-mb-md alert-warning">
-      Aby sa produkt zobrazil v klientskej časti musí mať aspoň 1 variant (farba, veľkosť).
+      <p>Aby sa produkt zobrazil v klientskej časti musí mať aspoň 1 variant (farba, veľkosť).</p>
+      <q-btn label="Pridať varianty" color="primary" @click="scrollToProductDesignList"/>
     </div>
     <q-card>
         <q-card-section>
@@ -112,7 +113,9 @@
             </div>
         </q-card-actions>
     </q-card>
-    <product-design-list @product-designs-fetched="saveProductDesignsCount"></product-design-list>
+    <product-design-list
+      ref="productDesignList"
+      @product-designs-fetched="saveProductDesignsCount"/>
 </div>
 </template>
 
@@ -274,6 +277,11 @@ export default {
 
     saveProductDesignsCount (productDesignsCount) {
       this.productDesignsCount = productDesignsCount
+    },
+
+    scrollToProductDesignList () {
+      const el = this.$refs.productDesignList.$el
+      el.scrollIntoView({ behavior: 'smooth' })
     }
   },
   mounted () {

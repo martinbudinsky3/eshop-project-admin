@@ -1,7 +1,8 @@
 <template>
   <div class="q-my-xl">
     <div v-if="answersCount < 2" class="q-pa-md q-mb-md alert-warning">
-      Aby sa anketa zobrazila v klientskej časti musí mať aspoň 2 možné odpovede.
+      <p>Aby sa anketa zobrazila v klientskej časti musí mať aspoň 2 možné odpovede.</p>
+      <q-btn label="Pridať odpovede" color="primary" @click="scrollToAnswerList"/>
     </div>
     <q-card>
         <q-card-section>
@@ -46,7 +47,9 @@
         </q-card-actions>
       </q-card>
 
-      <answer-list ref="answer-list" @answers-fetched="saveAnswersCount"></answer-list>
+      <answer-list
+        ref="answerList"
+        @answers-fetched="saveAnswersCount"/>
   </div>
 </template>
 
@@ -126,6 +129,11 @@ export default {
 
     saveAnswersCount (answersCount) {
       this.answersCount = answersCount
+    },
+
+    scrollToAnswerList () {
+      const el = this.$refs.answerList.$el
+      el.scrollIntoView({ behavior: 'smooth' })
     }
   },
 
