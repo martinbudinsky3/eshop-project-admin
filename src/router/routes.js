@@ -60,6 +60,16 @@ const routes = [
         component: () => import('pages/questions/Edit')
       }
     ]
+  },
+  {
+    path: '/login',
+    component: () => import('layouts/Main'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/Login')
+      }
+    ]
   }
 ]
 
