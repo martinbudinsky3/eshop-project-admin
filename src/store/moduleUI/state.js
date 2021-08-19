@@ -1,5 +1,5 @@
 export default {
   layout: {
-    drawerState: true
+    drawerState: false
   }
 }

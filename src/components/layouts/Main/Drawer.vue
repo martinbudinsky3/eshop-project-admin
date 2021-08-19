@@ -18,5 +18,20 @@
                 <q-item-label>Vytvorenie</q-item-label>
             </q-item>
         </q-list>
+        <q-item class="q-body-1">
+            <q-item-label @click="logout">Odhlásenie</q-item-label>
+        </q-item>
     </div>
 </template>
+
+<script>
+import AuthService from '../../../services/AuthService'
+
+export default {
+  methods: {
+    logout () {
+      AuthService.logout()
+    }
+  }
+}
+</script>
