@@ -59,7 +59,6 @@
 </style>
 
 <script>
-import axios from 'axios'
 import AnswerList from 'src/components/AnswerList.vue'
 
 export default {
@@ -87,8 +86,8 @@ export default {
     updateQuestion () {
       this.hideErrors()
 
-      axios
-        .put(process.env.API + '/questions/' + this.$route.params.id, this.questionData)
+      this.$api
+        .put(`/api/questions/${this.$route.params.id}`, this.questionData)
         .then(() => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Anketa bola úspešne upravená.' })
           this.$router.push({ path: '/questions/index' })
@@ -138,8 +137,8 @@ export default {
   },
 
   mounted () {
-    axios
-      .get(process.env.API + '/questions/' + this.$route.params.id + '/edit')
+    this.$api
+      .get(`/api/questions/${this.$route.params.id}/edit`)
       .then(response => {
         this.questionText = response.data.text
         this.dateFrom = response.data.date_from

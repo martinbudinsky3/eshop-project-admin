@@ -52,8 +52,6 @@
 </style>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -77,8 +75,8 @@ export default {
     createQuestion () {
       this.hideErrors()
 
-      axios
-        .post(process.env.API + '/questions', this.questionData)
+      this.$api
+        .post('/api/questions', this.questionData)
         .then(response => {
           this.questionId = response.data.id
         })

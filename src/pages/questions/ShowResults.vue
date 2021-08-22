@@ -51,8 +51,6 @@
 </style>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -73,8 +71,8 @@ export default {
   methods: {
     fetchQuestion () {
       this.loading = true
-      axios
-        .get(process.env.API + `/questions/${this.$route.params.id}`)
+      this.$api
+        .get(`/api/questions/${this.$route.params.id}`)
         .then(({ data }) => {
           this.question = data
           this.loading = false
@@ -91,8 +89,8 @@ export default {
     },
     fetchResults () {
       this.loading = true
-      axios
-        .get(process.env.API + `/questions/${this.$route.params.id}/results`)
+      this.$api
+        .get(`/api/questions/${this.$route.params.id}/results`)
         .then(({ data }) => {
           this.answers = data.answers
           this.loading = false

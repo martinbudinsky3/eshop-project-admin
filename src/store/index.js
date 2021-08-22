@@ -2,8 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import moduleUI from './moduleUI'
-
-// import example from './module-example'
+import auth from './auth'
 
 Vue.use(Vuex)
 
@@ -19,7 +18,8 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      moduleUI
+      moduleUI,
+      auth
     },
 
     // enable strict mode (adds overhead!)

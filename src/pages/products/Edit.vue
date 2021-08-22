@@ -135,7 +135,6 @@
 </style>
 
 <script>
-import axios from 'axios'
 import ProductDesignList from 'src/components/ProductDesignList.vue'
 
 export default {
@@ -180,8 +179,8 @@ export default {
       const config = { headers: { contentType: 'multipart/form-data' } }
       const uploadData = this.createFormData()
 
-      axios
-        .post(process.env.API + '/products/' + this.$route.params.id, uploadData, config)
+      this.$api
+        .post(`/api/products/${this.$route.params.id}`, uploadData, config)
         .then((response) => {
           console.log(response)
           this.$q.notify({ type: 'positive', timeout: 2000, message: response.data.success })
@@ -285,8 +284,8 @@ export default {
     }
   },
   mounted () {
-    axios
-      .get(process.env.API + '/brand')
+    this.$api
+      .get('/api/brands')
       .then(response => {
         this.brands = response.data
       })
@@ -295,14 +294,14 @@ export default {
         console.log(error)
       })
 
-    axios
-      .get(process.env.API + '/category')
+    this.$api
+      .get('/api/categories')
       .then(response => {
         this.mainCategories = response.data
       })
       .then(data => {
-        axios
-          .get(process.env.API + '/products/' + this.$route.params.id + '/edit')
+        this.$api
+          .get(`/api/products/${this.$route.params.id}/edit`)
           .then(response => {
             const product = response.data.product
 

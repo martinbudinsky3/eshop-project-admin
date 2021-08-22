@@ -64,7 +64,7 @@ module.exports = function (/* ctx */) {
       // extractCSS: false,
 
       env: {
-        API: 'http://eshop-project.test/api'
+        baseUrl: 'http://127.0.0.1:8000'
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack
@@ -135,7 +135,7 @@ module.exports = function (/* ctx */) {
       plugins: [
         'Notify',
         'Dialog',
-        'Cookies'
+        'LocalStorage'
       ]
     },
 

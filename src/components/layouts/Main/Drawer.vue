@@ -25,12 +25,16 @@
 </template>
 
 <script>
-import AuthService from '../../../services/AuthService'
-
 export default {
   methods: {
     logout () {
-      AuthService.logout()
+      this.$api
+        .post('/api/admin/logout')
+        .then(() => {
+          // TODO save flag to localStorage
+          this.$store.commit('auth/updateLoginFlag', false)
+          this.$router.push({ path: '/login' })
+        })
     }
   }
 }

@@ -108,7 +108,6 @@
 </style>
 
 <script>
-import axios from 'axios'
 
 export default {
   data () {
@@ -148,8 +147,8 @@ export default {
       const config = { headers: { contentType: 'multipart/form-data' } }
       const uploadData = this.createFormData()
 
-      axios
-        .post(process.env.API + '/products', uploadData, config)
+      this.$api
+        .post('/api/products', uploadData, config)
         .then(response => {
           this.productId = response.data.id
         })
@@ -233,9 +232,8 @@ export default {
     }
   },
   mounted () {
-    // TODO refactoring - split to multiple methods
-    axios
-      .get(process.env.API + '/category')
+    this.$api
+      .get('/api/categories')
       .then(response => {
         this.mainCategories = response.data
         this.selectedMainCategory = this.mainCategories[0]
@@ -246,8 +244,8 @@ export default {
         console.log(error)
       })
 
-    axios
-      .get(process.env.API + '/brand')
+    this.$api
+      .get('/api/brands')
       .then(response => {
         this.brands = response.data
       })

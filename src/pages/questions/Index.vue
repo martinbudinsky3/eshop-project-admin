@@ -37,8 +37,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -66,8 +64,8 @@ export default {
       // QTable to "loading" state
       this.loading = true
       // fetch data
-      axios
-        .get(process.env.API + `/questions?page=${pagination.page}&recordsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
+      this.$api
+        .get(`/api/questions?page=${pagination.page}&recordsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
         .then(({ data }) => {
           // updating pagination to reflect in the UI
           this.serverPagination = pagination
@@ -98,8 +96,8 @@ export default {
         ok: true,
         cancel: true
       }).onOk(() => {
-        axios
-          .delete(process.env.API + `/questions/${id}`)
+        this.$api
+          .delete(`/api/questions/${id}`)
           .then(() => {
             this.fetchQuestions(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Anketa bola odstránená.' })

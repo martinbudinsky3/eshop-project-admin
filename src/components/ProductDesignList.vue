@@ -83,8 +83,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -123,8 +121,8 @@ export default {
   },
   methods: {
     fetchColors () {
-      axios
-        .get(process.env.API + '/color')
+      this.$api
+        .get('/api/colors')
         .then(response => {
           this.colors = response.data
         })
@@ -135,8 +133,8 @@ export default {
     },
 
     fetchSizes () {
-      axios
-        .get(process.env.API + '/size')
+      this.$api
+        .get('/api/sizes')
         .then(response => {
           this.sizes = response.data
         })
@@ -149,8 +147,8 @@ export default {
     fetchProductDesigns () {
       this.loading = true
 
-      axios
-        .get(`${process.env.API}/products/${this.$route.params.id}/product-designs`)
+      this.$api
+        .get(`/api/products/${this.$route.params.id}/product-designs`)
         .then(({ data }) => {
           this.productDesigns = data.productDesigns
           this.$emit('product-designs-fetched', this.productDesigns.length)
@@ -169,9 +167,9 @@ export default {
     },
 
     createProductDesign () {
-      axios
+      this.$api
         .post(
-            `${process.env.API}/products/${this.$route.params.id}/product-designs`,
+            `/api/products/${this.$route.params.id}/product-designs`,
             this.productDesignData
         )
         .then((id) => {
@@ -197,9 +195,9 @@ export default {
     },
 
     editProductDesign () {
-      axios
+      this.$api
         .put(
-            `${process.env.API}/product-designs/${this.editedProductDesignId}`,
+            `/api/product-designs/${this.editedProductDesignId}`,
             this.productDesignData
         )
         .then(() => {
@@ -256,8 +254,8 @@ export default {
     },
 
     deleteProductDesign (id) {
-      axios
-        .delete(`${process.env.API}/product-designs/${id}`)
+      this.$api
+        .delete(`/api/product-designs/${id}`)
         .then(() => {
           this.fetchProductDesigns()
           this.$q.notify({

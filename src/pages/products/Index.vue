@@ -40,8 +40,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -69,8 +67,8 @@ export default {
       // QTable to "loading" state
       this.loading = true
       // fetch data
-      axios
-        .get(process.env.API + `/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
+      this.$api
+        .get(`/api/products/list/${pagination.page}?rowsPerPage=${pagination.rowsPerPage}&sortBy=${pagination.sortBy}&descending=${pagination.descending}&filter=${this.filter}`)
         .then(({ data }) => {
           // updating pagination to reflect in the UI
           this.serverPagination = pagination
@@ -101,8 +99,8 @@ export default {
         ok: true,
         cancel: true
       }).onOk(() => {
-        axios
-          .delete(process.env.API + `/products/${id}`)
+        this.$api
+          .delete(`/products/${id}`)
           .then(() => {
             this.request(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol odstránený.' })

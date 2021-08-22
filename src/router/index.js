@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import routes from './routes'
-import AuthService from '../services/AuthService'
 
 Vue.use(VueRouter)
 
@@ -15,7 +14,7 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ({ store /*, ssrContext */ }) {
   const Router = new VueRouter({
     scrollBehavior: () => ({ x: 0, y: 0 }),
     routes,
@@ -28,8 +27,11 @@ export default function (/* { store, ssrContext } */) {
   })
 
   Router.beforeEach((to, from, next) => {
-    if (to.path !== '/login' && !AuthService.isLoggedIn()) {
+    // TODO save login flag to localStorage
+    if (to.path !== '/login' && !store.state.auth.isLoggedIn) {
       next('/login')
+    } else if (to.path === '/login' && store.state.auth.isLoggedIn) {
+      next('/')
     } else {
       next()
     }

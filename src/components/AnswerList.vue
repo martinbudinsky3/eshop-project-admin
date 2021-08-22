@@ -64,8 +64,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data () {
     return {
@@ -94,8 +92,8 @@ export default {
     fetchAnswers () {
       this.loading = true
 
-      axios
-        .get(`${process.env.API}/questions/${this.$route.params.id}/answers`)
+      this.$api
+        .get(`/api/questions/${this.$route.params.id}/answers`)
         .then(({ data }) => {
           this.answers = data.answers
           this.$emit('answers-fetched', this.answers.length)
@@ -114,9 +112,9 @@ export default {
     },
 
     createAnswer () {
-      axios
-        .post(`${process.env.API}/questions/${this.$route.params.id}/answers`, this.answerData)
-        .then((id) => {
+      this.$api
+        .post(`/api/questions/${this.$route.params.id}/answers`, this.answerData)
+        .then(() => {
           this.$q.notify({
             type: 'positive',
             timeout: 2000,
@@ -139,8 +137,8 @@ export default {
     },
 
     editAnswer () {
-      axios
-        .put(`${process.env.API}/answers/${this.editedAnswerId}`, this.answerData)
+      this.$api
+        .put(`/api/answers/${this.editedAnswerId}`, this.answerData)
         .then(() => {
           this.$q.notify({
             type: 'positive',
@@ -191,8 +189,8 @@ export default {
     },
 
     deleteAnswer (id) {
-      axios
-        .delete(`${process.env.API}/answers/${id}`)
+      this.$api
+        .delete(`/api/answers/${id}`)
         .then(() => {
           this.fetchAnswers()
           this.$q.notify({
