@@ -32,7 +32,6 @@
 </template>
 
 <script>
-
 export default {
   data () {
     return {
@@ -53,7 +52,7 @@ export default {
             .post('/api/admin/login', this.credentials)
             .then(() => {
               // TODO save flag to localStorage
-              this.$store.commit('auth/updateLoginFlag', true)
+              this.$q.localStorage.set('isLoggedIn', true)
               this.$router.push({ path: '/' })
             })
             .catch(error => {

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { LocalStorage } from 'quasar'
 
 import routes from './routes'
 
@@ -28,9 +29,9 @@ export default function ({ store /*, ssrContext */ }) {
 
   Router.beforeEach((to, from, next) => {
     // TODO save login flag to localStorage
-    if (to.path !== '/login' && !store.state.auth.isLoggedIn) {
+    if (to.path !== '/login' && !LocalStorage.getItem('isLoggedIn')) {
       next('/login')
-    } else if (to.path === '/login' && store.state.auth.isLoggedIn) {
+    } else if (to.path === '/login' && LocalStorage.getItem('isLoggedIn')) {
       next('/')
     } else {
       next()

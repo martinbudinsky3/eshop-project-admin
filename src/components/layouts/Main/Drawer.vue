@@ -32,7 +32,7 @@ export default {
         .post('/api/admin/logout')
         .then(() => {
           // TODO save flag to localStorage
-          this.$store.commit('auth/updateLoginFlag', false)
+          this.$q.localStorage.set('isLoggedIn', false)
           this.$router.push({ path: '/login' })
         })
     }
