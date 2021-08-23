@@ -2,7 +2,7 @@
   <q-layout>
     <q-header>
       <q-toolbar>
-          <q-btn flat round dense icon="menu" @click="left = !left" class="q-mr-md"/>
+          <q-btn flat round dense icon="menu" v-if="!onLoginPage" @click="left = !left" class="q-mr-md"/>
           <q-toolbar-title>Eshop - admin<span slot="subtitle">Some subtitle</span></q-toolbar-title>
       </q-toolbar>
     </q-header>
@@ -35,6 +35,9 @@ export default {
     left: {
       get () { return this.$store.state.moduleUI.layout.drawerState },
       set (val) { this.$store.commit('moduleUI/updateDrawerState', val) }
+    },
+    onLoginPage () {
+      return this.$route.path === '/login'
     }
   }
 }

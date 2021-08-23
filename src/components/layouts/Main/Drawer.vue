@@ -31,8 +31,8 @@ export default {
       this.$api
         .post('/api/admin/logout')
         .then(() => {
-          // TODO save flag to localStorage
           this.$q.localStorage.set('isLoggedIn', false)
+          this.$store.commit('moduleUI/updateDrawerState', false)
           this.$router.push({ path: '/login' })
         })
     }
