@@ -1,6 +1,6 @@
 <template>
-<div class="q-my-xl">
-    <q-card>
+<div class="q-my-xl row justify-center items-center root">
+    <q-card class="login-form">
         <q-card-section>
             <h1 class="text-h5">
               Prihlásenie
@@ -31,6 +31,15 @@
 </div>
 </template>
 
+<style lang="stylus" scoped>
+  .login-form
+    width 100%
+    max-width 600px
+
+  .root
+    height 500px
+</style>
+
 <script>
 export default {
   data () {
@@ -45,24 +54,36 @@ export default {
 
   methods: {
     login () {
+      this.hideErrors()
+
       this.$api.get('/sanctum/csrf-cookie')
-        .then((response) => {
-          console.log(response)
+        .then(() => {
           this.$api
             .post('/api/admin/login', this.credentials)
             .then(() => {
-              // TODO save flag to localStorage
               this.$q.localStorage.set('isLoggedIn', true)
               this.$router.push({ path: '/' })
             })
             .catch(error => {
-              console.log(error)
-              if (error.code === 401) {
-                this.loginErrorMessage = error.data.message
+              if (error.response && error.response.status === 401) {
+                this.loginError = true
+                this.loginErrorMessage = error.response.data.message
               }
+              this.showErrorDialog()
             })
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+          console.log(error)
+          this.showErrorDialog()
+        })
+    },
+
+    hideErrors () {
+      this.loginError = false
+    },
+
+    showErrorDialog () {
+      this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nepodarilo sa prihlásiť.' })
     }
   },
 

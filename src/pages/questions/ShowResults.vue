@@ -41,7 +41,7 @@
   </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
   .small-h1
     font-size 2.5rem
   th
