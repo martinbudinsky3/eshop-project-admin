@@ -31,7 +31,7 @@
         <q-td class="text-right">
           <div>
             <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/products/' + props.row.id + '/edit')" />
-            <q-btn round icon="delete" @click="destroy(props.row.id, props.row.name, props.row.__index)"/>
+            <q-btn round icon="delete" @click="destroy(props.row.id, props.row.name)"/>
           </div>
         </q-td>
       </q-tr>
@@ -91,7 +91,7 @@ export default {
         })
     },
 
-    destroy (id, name, rowIndex) {
+    destroy (id, name) {
       this.$q.dialog({
         title: 'Odstránenie',
         message: 'Naozaj chcete odstrániť ' + name + '?',
@@ -100,7 +100,7 @@ export default {
         cancel: true
       }).onOk(() => {
         this.$api
-          .delete(`/products/${id}`)
+          .delete(`/api/products/${id}`)
           .then(() => {
             this.request(this.requestParams)
             this.$q.notify({ type: 'positive', timeout: 2000, message: 'Produkt bol odstránený.' })

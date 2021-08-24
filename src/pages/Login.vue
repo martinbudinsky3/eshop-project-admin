@@ -44,8 +44,8 @@
 export default {
   data () {
     return {
-      email: 'admin@example.com',
-      password: '12345678',
+      email: '',
+      password: '',
 
       loginError: false,
       loginErrorMessage: ''

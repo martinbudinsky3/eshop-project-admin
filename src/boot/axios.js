@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
+import { LocalStorage } from 'quasar'
 
 export default ({ app, router, store }) => {
   const api = axios.create({
@@ -11,8 +12,10 @@ export default ({ app, router, store }) => {
     if (
       error.response &&
       (error.response.status === 401 || error.response.status === 419) &&
-      router.url !== '/login'
+      router.currentRoute.path !== '/login'
     ) {
+      console.log(router.currentRoute.path)
+      LocalStorage.set('isLoggedIn', false)
       router.push({ path: '/login' })
     } else {
       throw error
