@@ -14,7 +14,6 @@ export default ({ app, router, store }) => {
       (error.response.status === 401 || error.response.status === 419) &&
       router.currentRoute.path !== '/login'
     ) {
-      console.log(router.currentRoute.path)
       LocalStorage.set('isLoggedIn', false)
       router.push({ path: '/login' })
     } else {
