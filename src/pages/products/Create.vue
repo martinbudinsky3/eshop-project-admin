@@ -11,7 +11,6 @@
               class="q-mb-sm"
               label="Názov"
               maxlength="255"
-              counter
               autogrow
               v-model="productName"
               :error-message="nameErrorMessage"

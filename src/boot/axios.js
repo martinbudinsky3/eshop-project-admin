@@ -16,6 +16,7 @@ export default ({ app, router, store }) => {
     ) {
       LocalStorage.set('isLoggedIn', false)
       router.push({ path: '/login' })
+      store.commit('moduleUI/updateDrawerState', false)
     } else {
       throw error
     }

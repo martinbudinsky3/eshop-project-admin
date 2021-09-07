@@ -15,7 +15,6 @@
               class="q-mb-sm"
               label="Názov"
               maxlength="255"
-              counter
               v-model="productName"
               error-message="Pole názov je povinné."
               :error="nameError"
@@ -85,7 +84,7 @@
             <ul class="ls-none">
               <li class="cursor-pointer q-px-sm d-inline" v-for="(image, index) in originalImages" :key="index">
                 <q-img
-                  :src="'http://eshop-project.test/' + image.path"
+                  :src="`${baseUrl}/${image.path}`"
                   spinner-color="grey"
                   class="image-item"
                 >
@@ -190,7 +189,7 @@ export default {
             console.log(error.response.data.errors)
             this.showErrors(error.response.data.errors)
           }
-          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nastala chyba.' })
+          this.$q.notify({ type: 'negative', timeout: 2000, message: 'Nepodarilo sa upraviť produkt.' })
           console.log(error)
         })
     },
@@ -325,6 +324,11 @@ export default {
         this.$q.notify({ type: 'negative', timeout: 2000, message: 'Chyba pri načítaní kategórií.' })
         console.log(error)
       })
+  },
+  computed: {
+    baseUrl: function () {
+      return process.env.baseUrl
+    }
   }
 }
 </script>

@@ -15,7 +15,6 @@
             class="q-mb-sm"
             type="textarea"
             label="Text otázky"
-            counter
             v-model="questionText"
             :error-message="questionTextErrorMessage"
             :error="questionTextError"
@@ -90,7 +89,6 @@ export default {
         .put(`/api/questions/${this.$route.params.id}`, this.questionData)
         .then(() => {
           this.$q.notify({ type: 'positive', timeout: 2000, message: 'Anketa bola úspešne upravená.' })
-          this.$router.push({ path: '/questions/index' })
         })
         .catch(error => {
           if (error.response.data.errors) {

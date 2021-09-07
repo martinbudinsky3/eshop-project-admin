@@ -11,7 +11,6 @@
             class="q-mb-sm"
             type="textarea"
             label="Text otázky"
-            counter
             autogrow
             v-model="questionText"
             :error-message="questionTextErrorMessage"

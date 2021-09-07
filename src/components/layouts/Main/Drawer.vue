@@ -29,7 +29,7 @@
             </q-expansion-item>
             <q-item clickable v-ripple class="q-body-1">
                 <q-item-section avatar>
-                    <q-icon color="primary" name="logout" />
+                    <q-icon name="logout" />
                 </q-item-section>
 
                 <q-item-section>

@@ -85,6 +85,7 @@ export default {
         .catch(error => {
           console.log(error)
           // TODO show error dialog
+
           // we tell QTable to exit the "loading" state
           this.loading = false
         })

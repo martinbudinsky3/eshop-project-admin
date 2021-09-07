@@ -315,7 +315,7 @@ export default {
   computed: {
     productDesignData: function () {
       return {
-        color: this.productDesignColor.id,
+        color: this.productDesignColor && this.productDesignColor.id,
         size: this.productDesignSize,
         quantity: this.productDesignQuantity
       }
